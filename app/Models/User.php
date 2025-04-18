@@ -55,6 +55,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function admin ()
+    {
+        return $this->hasOne(Admin::class, 'kode_admin');
+    }
+    
     public function mahasiswa ()
     {
         return $this->hasOne(Mahasiswa::class, 'id_pengguna');

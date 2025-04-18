@@ -10,13 +10,15 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component {
+new #[Layout('layouts.guest')] class extends Component 
+{
     public string $nama_pengguna = '';
     public string $tanggal_lahir = '';
     public string $alamat = '';
     public string $role = '';
     public string $nim = '';
     public string $nip = '';
+    public string $kode_admin = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -32,9 +34,10 @@ new #[Layout('layouts.guest')] class extends Component {
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
             'tanggal_lahir' => ['required', 'date'],
             'alamat' => ['required', 'string'],
-            'role' => ['required', 'in:dosen,mahasiswa'],
+            'role' => ['required', 'in:admin,dosen,mahasiswa'],
             'nim' => ['nullable', 'string', 'max:10', 'required_if:role,mahasiswa'],
             'nip' => ['nullable', 'string', 'max:20', 'required_if:role,dosen'],
+            'kode_admin' => ['nullable', 'string', 'max:10', 'required_if:role,admin'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -48,6 +51,8 @@ new #[Layout('layouts.guest')] class extends Component {
             'role' => $validated['role'],
         ]);
 
+        $user->assignRole($validated['role']);
+
         if ($validated['role'] === 'dosen') {
             Dosen::create([
                 'id_pengguna' => $user->id_pengguna,
@@ -57,6 +62,11 @@ new #[Layout('layouts.guest')] class extends Component {
             Mahasiswa::create([
                 'id_pengguna' => $user->id_pengguna,
                 'nim' => $validated['nim'],
+            ]);
+        } elseif ($validated['role'] === 'admin') {
+            Admin::create([
+                'id_pengguna' => $user->id_pengguna,
+                'kode_admin' => $validated['kode_admin'],
             ]);
         }
 
@@ -99,6 +109,7 @@ new #[Layout('layouts.guest')] class extends Component {
             <x-input-label for="role" :value="__('Role')" />
             <select wire:model.live="role" id="role" name="role" class="block mt-1 w-full">
                 <option value="">{{ __('Pilih Role') }}</option>
+                <option value="admin">{{ __('Admin') }}</option>
                 <option value="dosen">{{ __('Dosen') }}</option>
                 <option value="mahasiswa">{{ __('Mahasiswa') }}</option>
             </select>
@@ -117,6 +128,13 @@ new #[Layout('layouts.guest')] class extends Component {
             <x-input-label for="nim" :value="__('NIM')" />
             <x-text-input wire:model="nim" id="nim" name="nim" type="text" class="block mt-1 w-full" />
             <x-input-error :messages="$errors->get('nim')" class="mt-2" />
+        </div>
+
+        <!-- Kode Admin -->
+        <div class="mt-4" style="{{ $role === 'admin' ? '' : 'display: none;' }}">
+            <x-input-label for="kode_admin" :value="__('Kode Admin')" />
+            <x-text-input wire:model="kode_admin" id="kode_admin" name="kode_admin" type="text" class="block mt-1 w-full" />
+            <x-input-error :messages="$errors->get('kode_admin')" class="mt-2" />
         </div>
 
         <!-- Email Address -->

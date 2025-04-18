@@ -19,4 +19,29 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(User::class, 'id_pengguna', 'id_pengguna');
     }
+
+    public function event()
+    {
+        return $this->hasMany(Event::class, 'nim', 'nim');
+    }
+
+    public function oprek_loker_project()
+    {
+        return $this->hasMany(OprekLokerProject::class, 'nim', 'nim');
+    }
+
+    public function pengabdian()
+    {
+        return $this->belongsToMany(Pengabdian::class, 'dosen_mahasiswa_pengabdian', 'nim', 'id_pengabdian');
+    }
+
+    public function portofolio()
+    {
+        return $this->belongsToMany(Portofolio::class, 'dosen_mahasiswa_portofolio', 'nim', 'id_portofolio');
+    }
+
+    public function prestasi()
+    {
+        return $this->belongsToMany(Prestasi::class, 'dosen_mahasiswa_prestasi', 'nim', 'id_prestasi');
+    }
 }
