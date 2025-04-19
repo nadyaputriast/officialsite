@@ -21,6 +21,7 @@ class OprekLokerProject extends Model
 		'deadline_project',
 		'penyelenggara',
 		'tautan_oprek',
+        'thumbnail_oprek',
 		'kode_admin',
 		'nip',
 		'nim',

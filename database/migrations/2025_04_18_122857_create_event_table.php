@@ -20,10 +20,11 @@ return new class extends Migration
             $table->text('deskripsi_event');
             $table->enum('penyelenggara_event', ['internal', 'eksternal']);
             $table->string('nama_penyelenggara');
-            $table->string('tautan_event');
+            $table->string('tautan_event')->nullable();
             $table->string('thumbnail_event');
-            $table->unsignedBigInteger('kode_admin');
-            $table->unsignedBigInteger('nim');
+            $table->integer('kuota_event')->nullable();
+            $table->unsignedBigInteger('kode_admin')->nullable();
+            $table->unsignedBigInteger('nim')->nullable();
             $table->timestamps();
 
             // foreign key

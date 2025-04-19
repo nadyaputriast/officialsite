@@ -10,6 +10,9 @@ class Event extends Model
     use HasFactory;
 
     protected $table = 'event';
+    protected $primaryKey = 'id_event';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'id_event',
@@ -21,6 +24,7 @@ class Event extends Model
         'penyelenggara_event',
         'nama_penyelenggara',
         'tautan_event',
+        'kuota_event',
         'thumbnail_event',
         'kode_admin',
         'nim',
@@ -34,5 +38,10 @@ class Event extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
+    }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'event_registration');
     }
 }

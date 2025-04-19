@@ -34,4 +34,13 @@ class Portofolio extends Model
     {
         return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa_portofolio', 'id_portofolio', 'nim');
     }
+
+    public function index()
+    {
+        $dataPortofolio = Portofolio::where('status_portofolio', 'valid')->get();
+
+        return view('dashboard', [
+            'dataPortofolio' => $dataPortofolio,
+        ]);
+    }
 }

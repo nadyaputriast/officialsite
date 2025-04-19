@@ -18,13 +18,15 @@ return new class extends Migration
             $table->date('deadline_project');
             $table->string('penyelenggara');
             $table->string('tautan_oprek');
-            $table->unsignedBigInteger('kode_admin');
-            $table->unsignedBigInteger('nip');
-            $table->unsignedBigInteger('nim');
+            $table->string('thumbnail_oprek');
+            $table->unsignedBigInteger('kode_admin')->nullable();
+            $table->unsignedBigInteger('nip')->nullable();
+            $table->unsignedBigInteger('nim')->nullable();
             $table->timestamps();
 
             // foreign key
             $table->foreign('kode_admin')->references('kode_admin')->on('admin')->onDelete('cascade');
+            $table->foreign('nip')->references('nip')->on('dosen')->onDelete('cascade');
             $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }

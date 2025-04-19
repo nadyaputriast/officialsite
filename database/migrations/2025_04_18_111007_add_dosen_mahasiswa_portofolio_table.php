@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('dosen_mahasiswa_portofolio', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_portofolio');
-            $table->unsignedBigInteger('nip');
-            $table->unsignedBigInteger('nim');
+            $table->unsignedBigInteger('nip')->nullable();
+            $table->unsignedBigInteger('nim')->nullable();
             $table->timestamps();
 
             // Foreign keys

@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Filament\Models\Contracts\HasName;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasName
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasRoles, Notifiable;
@@ -55,18 +56,52 @@ class User extends Authenticatable
         ];
     }
 
-    public function admin ()
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->role) {
+                $user->assignRole($user->role);
+            }
+        });
+    }
+
+    public function getFilamentName(): string
+    {
+        return (string) ($this->nama_pengguna ?? 'Default User');
+    }
+
+    public function getUserName(): string
+    {
+        return $this->nama_pengguna ?: 'Default User';
+    }
+
+    public function admin()
     {
         return $this->hasOne(Admin::class, 'kode_admin');
     }
-    
-    public function mahasiswa ()
+
+    public function mahasiswa()
     {
         return $this->hasOne(Mahasiswa::class, 'id_pengguna');
     }
 
-    public function dosen ()
+    public function dosen()
     {
         return $this->hasOne(Dosen::class, 'id_pengguna');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_registration');
+    }
+
+    public function getKodeAdmin()
+    {
+        return $this->is_admin ? $this->kode_admin : null;
+    }
+
+    public function getNim()
+    {
+        return !$this->is_admin ? $this->nim : null;
     }
 }
