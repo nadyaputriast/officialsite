@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_sertifikasi');
             $table->string('nama_sertifikasi');
             $table->text('deskripsi_sertifikasi');
-            $table->enum('status_sertifikasi', ['valid', 'nonvalid']);
+            $table->boolean('status_sertifikasi')->default(false);
             $table->string('penyelenggara');
             $table->date('tanggal_sertifikasi');
             $table->integer('masa_berlaku')->nullable();

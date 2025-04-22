@@ -26,7 +26,10 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/portofolio/create', [PortofolioController::class, 'create'])->name('portofolio.create');
-    Route::post('/portofolio', [PortofolioController::class, 'store'])->name('portofolio.store');
+    Route::post('/portofolio', [PortofolioController::class, 'store']);
+    Route::get('/portofolio/{id}', [PortofolioController::class, 'show'])->name('portofolio.show');
+    Route::put('/portofolio/{id}', [PortofolioController::class, 'update'])->name('portofolio.update');
+    Route::get('/portofolio/{id}/edit', [PortofolioController::class, 'edit'])->name('portofolio.edit');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

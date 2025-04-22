@@ -16,6 +16,7 @@ class Portofolio extends Model
 
     protected $fillable = [
         'id_portofolio',
+        'id_pengguna',
         'nama_portofolio',
         'deskripsi_portofolio',
         'status_portofolio',
@@ -27,20 +28,49 @@ class Portofolio extends Model
 
     public function dosen()
     {
-        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa_portofolio', 'id_portofolio', 'nip');
+        return $this->belongsToMany(Dosen::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna');
     }
 
     public function mahasiswa()
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa_portofolio', 'id_portofolio', 'nim');
+        return $this->belongsToMany(Mahasiswa::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna');
+    }
+
+    // public function users()
+    // {
+    //     return $this->belongsTo(User::class, 'portofolio', 'id_portofolio', 'id_pengguna')
+    //         ->withTimestamps();
+    // }
+
+    public function kategoris()
+    {
+        return $this->hasMany(KategoriPortofolio::class, 'id_portofolio');
+    }
+
+    public function gambar()
+    {
+        return $this->hasMany(GambarPortofolio::class, 'id_portofolio');
     }
 
     public function index()
     {
-        $dataPortofolio = Portofolio::where('status_portofolio', 'valid')->get();
+        $dataPortofolio = Portofolio::where('status_portofolio', true)->get();
+        $users = User::all();
 
         return view('dashboard', [
             'dataPortofolio' => $dataPortofolio,
+            'users' => $users,
         ]);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'id_pengguna');
+    }
+
+    public function taggedUsers()
+    {
+        return $this->belongsToMany(User::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna')
+            ->withTimestamps();
     }
 }

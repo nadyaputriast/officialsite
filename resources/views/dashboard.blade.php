@@ -41,36 +41,35 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Portofolio</h3>
-                    <a href="{{ route('portofolio.create') }}" class="px-4 py-2 bg-green-500 text-black rounded">Tambah Portofolio</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Portofolio</h3>
-
+                    <h3 class="text-lg font-semibold mb-2">Portofolio</h3>
+                    <a href="{{ route('portofolio.create') }}" class="text-red-500 mb-2">Tambah Portofolio</a>
                     @forelse ($dataPortofolio as $portofolio)
                         <div class="mb-4">
                             <h4 class="font-bold">{{ $portofolio->nama_portofolio }}</h4>
                             <p>{{ $portofolio->deskripsi_portofolio }}</p>
                             <p>
-                                <strong>Pengguna:</strong>
-                                @if ($portofolio->mahasiswa)
-                                    {{ $portofolio->mahasiswa->name }} (Mahasiswa)
-                                @elseif ($portofolio->dosen)
-                                    {{ $portofolio->dosen->name }} (Dosen)
+                                <strong>Pembuat dan Ditandai:</strong>
+                                @php
+                                    $allUsers = collect();
+                                    if ($portofolio->owner) {
+                                        $allUsers->push($portofolio->owner->nama_pengguna);
+                                    }
+                                    if ($portofolio->taggedUsers->isNotEmpty()) {
+                                        $allUsers = $allUsers->merge($portofolio->taggedUsers->pluck('nama_pengguna')); // Gabungkan dengan taggedUsers
+                                    }
+                                @endphp
+
+                                @if ($allUsers->isNotEmpty())
+                                    {{ $allUsers->join(', ', ' dan ') }}
+                                @else
+                                    Tidak ada pengguna terkait
                                 @endif
                             </p>
-                            <a href="{{ $portofolio->tautan_portofolio }}" target="_blank" class="text-blue-500">Lihat
-                                Portofolio</a>
+                            <a href="{{ route('portofolio.show', $portofolio->id_portofolio) }}"
+                                class="text-blue-500">Lihat Portofolio</a>
                         </div>
                     @empty
-                        <p class="text-gray-500">Belum ada portofolio yang disetujui.</p>
+                        <p class="text-gray-500">Belum ada portofolio yang divalidasi.</p>
                     @endforelse
                 </div>
             </div>

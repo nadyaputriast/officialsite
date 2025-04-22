@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_prestasi');
             $table->string('nama_prestasi');
             $table->text('deskripsi_prestasi');
-            $table->enum('status_prestasi', ['valid', 'nonvalid']);
+            $table->boolean('status_prestasi')->default(false);
             $table->date('tanggal_perolehan');
             $table->enum('tingkatan_prestasi', ['Regional', 'Nasional', 'Internasional']);
             $table->enum('jenis_prestasi', ['Akademik', 'Non-Akademik']);

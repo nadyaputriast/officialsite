@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dosen_mahasiswa_portofolio', function (Blueprint $table) {
-            $table->id();
+        Schema::create('gambar_portofolio', function (Blueprint $table) {
+            $table->id('id_gambar_portofolio');
+            $table->string('gambar_portofolio');
             $table->unsignedBigInteger('id_portofolio');
-            $table->unsignedBigInteger('nip')->nullable();
-            $table->unsignedBigInteger('nim')->nullable();
             $table->timestamps();
 
-            // Foreign keys
             $table->foreign('id_portofolio')->references('id_portofolio')->on('portofolio')->onDelete('cascade');
-            $table->foreign('nip')->references('nip')->on('dosen')->onDelete('cascade');
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('gambar_portofolio');
     }
 };

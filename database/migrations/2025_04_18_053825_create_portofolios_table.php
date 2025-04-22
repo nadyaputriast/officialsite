@@ -13,14 +13,20 @@ return new class extends Migration
     {
         Schema::create('portofolio', function (Blueprint $table) {
             $table->id('id_portofolio');
+            $table->unsignedBigInteger('id_pengguna');
             $table->string('nama_portofolio');
             $table->text('deskripsi_portofolio');
-            $table->enum('status_portofolio', ['valid', 'nonvalid']);
             $table->string('tautan_portofolio');
+            $table->json('kategori_portofolio')->nullable();
+            $table->json('gambar_portofolio')->nullable();
+            $table->tinyInteger('status_portofolio')->default(0);
             $table->integer('view_count')->default(0);
             $table->integer('banyak_upvote')->default(0);
             $table->integer('banyak_downvote')->default(0);
             $table->timestamps();
+
+            // foreign key
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

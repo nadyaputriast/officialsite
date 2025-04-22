@@ -95,6 +95,17 @@ class User extends Authenticatable implements HasName
         return $this->belongsToMany(Event::class, 'event_registration');
     }
 
+    public function portofolio()
+    {
+        return $this->hasMany(Portofolio::class, 'id_pengguna');
+    }
+
+    public function taggedPortofolios()
+    {
+        return $this->belongsToMany(Portofolio::class, 'portofolio_user_tags', 'id_pengguna', 'id_portofolio')
+            ->withTimestamps();
+    }
+
     public function getKodeAdmin()
     {
         return $this->is_admin ? $this->kode_admin : null;

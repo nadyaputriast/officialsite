@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_pengabdian');
             $table->string('judul_pengabdian');
             $table->text('deskripsi_pengabdian');
-            $table->enum('status_pengabdian', ['valid', 'nonvalid']);
+            $table->boolean('status_pengabdian')->default(false);
             $table->date('tanggal_pengabdian');
             $table->string('pelaksana');
             $table->timestamps();
