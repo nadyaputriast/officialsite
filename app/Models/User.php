@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasName;
 
-class User extends Authenticatable implements HasName
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasRoles, Notifiable;
@@ -65,11 +65,6 @@ class User extends Authenticatable implements HasName
         });
     }
 
-    public function getFilamentName(): string
-    {
-        return (string) ($this->nama_pengguna ?? 'Default User');
-    }
-
     public function getUserName(): string
     {
         return $this->nama_pengguna ?: 'Default User';
@@ -114,5 +109,10 @@ class User extends Authenticatable implements HasName
     public function getNim()
     {
         return !$this->is_admin ? $this->nim : null;
+    }
+
+    public function oprekProjects()
+    {
+        return $this->hasMany(OprekLokerProject::class, 'id_pengguna');
     }
 }

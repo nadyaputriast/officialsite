@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Portofolio;
-use App\Models\Mahasiswa;
-use App\Models\Dosen;
 use App\Models\User;
 use App\Models\KategoriPortofolio;
 use App\Models\GambarPortofolio;
+use App\Models\TautanPortofolio;
+use App\Models\ToolsPortofolio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -44,9 +44,11 @@ class PortofolioController extends Controller
             'nama_portofolio' => 'required|string|max:255',
             'kategori_portofolio' => 'required|array',
             'deskripsi_portofolio' => 'required|string',
-            'tautan_portofolio' => 'required|url',
             'gambar_portofolio' => 'required|array',
             'gambar_portofolio.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tools_portofolio' => 'required|array',
+            'tautan_portofolio' => 'required|array',
+            'dokumen_portofolio' => 'nullable|file|mimes:pdf,doc,docx,zip|max:20480',
             'user_tags' => 'nullable|string',
         ]);
 
@@ -60,9 +62,14 @@ class PortofolioController extends Controller
             $portofolio = new Portofolio();
             $portofolio->nama_portofolio = $request->input('nama_portofolio');
             $portofolio->deskripsi_portofolio = $request->input('deskripsi_portofolio');
-            $portofolio->tautan_portofolio = $request->input('tautan_portofolio');
             $portofolio->id_pengguna = $user->id_pengguna;
             $portofolio->save();
+
+            // Menyimpan dokumen jika ada
+            if ($request->hasFile('dokumen_portofolio')) {
+                $path = $request->file('dokumen_portofolio')->store('portofolio_dokumen', 'public');
+                $portofolio->dokumen_portofolio = $path;
+            }
 
             // Menyimpan kategori portofolio
             if (!empty($request->input('kategori_portofolio'))) {
@@ -77,10 +84,31 @@ class PortofolioController extends Controller
             // Menyimpan gambar portofolio
             if ($request->hasFile('gambar_portofolio')) {
                 foreach ($request->file('gambar_portofolio') as $image) {
-                    $path = $image->store('public/portofolio');
+                    $path = $image->store('portofolio', 'public');
+                    
                     GambarPortofolio::create([
-                        'gambar_portofolio' => $path,
+                        'gambar_portofolio' => $path, // Path akan tersimpan sebagai 'portofolio/filename.jpg'
                         'id_portofolio' => $portofolio->id_portofolio,
+                    ]);
+                }
+            }
+
+            // Menyimpan tools portofolio
+            if (!empty($request->input('tools_portofolio'))) {
+                foreach ($request->input('tools_portofolio') as $toolsNama) {
+                    ToolsPortofolio::create([
+                        'tools_portofolio' => $toolsNama,
+                        'id_portofolio' => $portofolio->id_portofolio
+                    ]);
+                }
+            }
+
+            // Menyimpan tautan portofolio 
+            if (!empty($request->input('tautan_portofolio'))) {
+                foreach ($request->input('tautan_portofolio') as $tautanNama) {
+                    TautanPortofolio::create([
+                        'tautan_portofolio' => $tautanNama,
+                        'id_portofolio' => $portofolio->id_portofolio
                     ]);
                 }
             }
@@ -102,7 +130,7 @@ class PortofolioController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Gagal menyimpan portofolio: ' . $e->getMessage());
-            return back()->with('error', 'Gagal menyimpan portofolio.')->withInput();
+            return back()->with('error', $e->getMessage())->withInput();
         }
     }
 
@@ -116,9 +144,13 @@ class PortofolioController extends Controller
 
         $request->validate([
             'nama_portofolio' => 'required|string|max:255',
+            'kategori_portofolio' => 'required|array',
             'deskripsi_portofolio' => 'required|string',
-            'tautan_portofolio' => 'required|url',
-            'gambar_portofolio.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gambar_portofolio' => 'required|array',
+            'gambar_portofolio.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tools_portofolio' => 'required|array',
+            'tautan_portofolio' => 'required|array',
+            'dokumen_portofolio' => 'nullable|file|mimes:pdf,doc,docx,zip|max:20480',
             'user_tags' => 'nullable|string',
         ]);
 
@@ -127,15 +159,36 @@ class PortofolioController extends Controller
         try {
             $portofolio->nama_portofolio = $request->nama_portofolio;
             $portofolio->deskripsi_portofolio = $request->deskripsi_portofolio;
-            $portofolio->tautan_portofolio = $request->tautan_portofolio;
+
+            // Ganti dokumen jika ada dokumen baru
+            if ($request->hasFile('dokumen_portofolio')) {
+                // Hapus dokumen lama jika ada
+                if ($portofolio->dokumen_portofolio && Storage::exists('public/' . $portofolio->dokumen_portofolio)) {
+                    Storage::delete('public/' . $portofolio->dokumen_portofolio);
+                }
+
+                // Simpan dokumen baru
+                $path = $request->file('dokumen_portofolio')->store('portofolio_dokumen', 'public');
+                $portofolio->dokumen_portofolio = $path;
+            }
+
             $portofolio->save();
 
             if ($request->has('kategori_portofolio')) {
-                // Hapus kategori lama
-                KategoriPortofolio::where('id_portofolio', $portofolio->id_portofolio)->delete();
+                $kategoriBaru = collect($request->kategori_portofolio);
 
-                // Tambahkan kategori baru
-                foreach ($request->kategori_portofolio as $kategori) {
+                // Ambil kategori lama
+                $kategoriLama = KategoriPortofolio::where('id_portofolio', $portofolio->id_portofolio)->pluck('kategori_portofolio');
+
+                // Hapus kategori yang tidak ada dalam input baru
+                $kategoriUntukDihapus = $kategoriLama->diff($kategoriBaru);
+                KategoriPortofolio::where('id_portofolio', $portofolio->id_portofolio)
+                    ->whereIn('kategori_portofolio', $kategoriUntukDihapus)
+                    ->delete();
+
+                // Tambahkan kategori baru yang belum ada
+                $kategoriUntukDitambahkan = $kategoriBaru->diff($kategoriLama);
+                foreach ($kategoriUntukDitambahkan as $kategori) {
                     KategoriPortofolio::create([
                         'id_portofolio' => $portofolio->id_portofolio,
                         'kategori_portofolio' => $kategori,
@@ -153,7 +206,7 @@ class PortofolioController extends Controller
 
                 // Simpan gambar baru
                 foreach ($request->file('gambar_portofolio') as $image) {
-                    $path = $image->store('public/portofolio');
+                    $path = $image->store('portofolio', 'public');
                     GambarPortofolio::create([
                         'gambar_portofolio' => $path,
                         'id_portofolio' => $portofolio->id_portofolio,
@@ -161,17 +214,68 @@ class PortofolioController extends Controller
                 }
             }
 
+            if ($request->has('tautan_portofolio')) {
+                $tautanBaru = collect($request->tautan_portofolio);
+
+                // Ambil tautan lama
+                $tautanLama = TautanPortofolio::where('id_portofolio', $portofolio->id_portofolio)->pluck('tautan_portofolio');
+
+                // Hapus tautan yang tidak ada dalam input baru
+                $tautanUntukDihapus = $tautanLama->diff($tautanBaru);
+                TautanPortofolio::where('id_portofolio', $portofolio->id_portofolio)
+                    ->whereIn('tautan_portofolio', $tautanUntukDihapus)
+                    ->delete();
+
+                // Tambahkan tautan baru yang belum ada
+                $tautanUntukDitambahkan = $tautanBaru->diff($tautanLama);
+                foreach ($tautanUntukDitambahkan as $tautan) {
+                    TautanPortofolio::create([
+                        'id_portofolio' => $portofolio->id_portofolio,
+                        'tautan_portofolio' => $tautan,
+                    ]);
+                }
+            }
+
+            if ($request->has('tools_portofolio')) {
+                $toolsBaru = collect($request->tools_portofolio);
+
+                // Ambil tools lama
+                $toolsLama = ToolsPortofolio::where('id_portofolio', $portofolio->id_portofolio)->pluck('tools_portofolio');
+
+                // Hapus tools yang tidak ada dalam input baru
+                $toolsUntukDihapus = $toolsLama->diff($toolsBaru);
+                ToolsPortofolio::where('id_portofolio', $portofolio->id_portofolio)
+                    ->whereIn('tools_portofolio', $toolsUntukDihapus)
+                    ->delete();
+
+                // Tambahkan tools baru yang belum ada
+                $toolsUntukDitambahkan = $toolsBaru->diff($toolsLama);
+                foreach ($toolsUntukDitambahkan as $tools) {
+                    ToolsPortofolio::create([
+                        'id_portofolio' => $portofolio->id_portofolio,
+                        'tools_portofolio' => $tools,
+                    ]);
+                }
+            }
+
             // Update tag pengguna
-            $portofolio->taggedUsers()->detach(); // Hapus tag lama
             if (!empty($request->user_tags)) {
                 $tags = collect(explode(',', $request->user_tags))->map(function ($tag) {
                     return trim(ltrim($tag, '@'));
                 });
 
-                $taggedUsers = User::whereIn('nama_pengguna', $tags)->pluck('id_pengguna');
-                if ($taggedUsers->isNotEmpty()) {
-                    $portofolio->taggedUsers()->attach($taggedUsers);
-                }
+                // Ambil pengguna yang ditag sebelumnya
+                $taggedUsersLama = $portofolio->taggedUsers->pluck('nama_pengguna');
+
+                // Hapus tag lama yang tidak ada dalam input baru
+                $tagsUntukDihapus = $taggedUsersLama->diff($tags);
+                $usersUntukDihapus = User::whereIn('nama_pengguna', $tagsUntukDihapus)->pluck('id_pengguna');
+                $portofolio->taggedUsers()->detach($usersUntukDihapus);
+
+                // Tambahkan tag baru yang belum ada
+                $tagsUntukDitambahkan = $tags->diff($taggedUsersLama);
+                $usersUntukDitambahkan = User::whereIn('nama_pengguna', $tagsUntukDitambahkan)->pluck('id_pengguna');
+                $portofolio->taggedUsers()->attach($usersUntukDitambahkan);
             }
 
             DB::commit();
@@ -190,24 +294,28 @@ class PortofolioController extends Controller
         DB::beginTransaction();
 
         try {
-            // Hapus kategori terkait
-            KategoriPortofolio::where('id_portofolio', $id)->delete();
+            // Hapus dokumen jika ada
+            if ($portofolio->dokumen_portofolio && Storage::exists('public/' . $portofolio->dokumen_portofolio)) {
+                Storage::delete('public/' . $portofolio->dokumen_portofolio);
+            }
 
-            // Hapus gambar terkait
-            $gambarPortofolios = GambarPortofolio::where('id_portofolio', $id)->get();
-            foreach ($gambarPortofolios as $gambar) {
-                // Hapus file fisik jika ada
+            // Hapus kategori, gambar, tools, dan tautan terkait
+            KategoriPortofolio::where('id_portofolio', $id)->delete();
+            GambarPortofolio::where('id_portofolio', $id)->each(function ($gambar) {
                 if (Storage::exists($gambar->gambar_portofolio)) {
                     Storage::delete($gambar->gambar_portofolio);
                 }
                 $gambar->delete();
-            }
-
+            });
+            ToolsPortofolio::where('id_portofolio', $id)->delete();
+            TautanPortofolio::where('id_portofolio', $id)->delete();
+    
             // Hapus tagged users
             $portofolio->taggedUsers()->detach();
 
             // Hapus semua tagged users kecuali pemilik portofolio
             $portofolio->taggedUsers()->sync([], false);
+            $portofolio->delete();
 
             DB::commit();
             return redirect()->route('dashboard')->with('success', 'Portofolio berhasil dihapus.');
@@ -220,14 +328,14 @@ class PortofolioController extends Controller
 
     public function show($id)
     {
-        $portofolio = Portofolio::with(['gambar', 'kategoris', 'taggedUsers', 'owner'])->findOrFail($id);
+        $portofolio = Portofolio::with(['gambar', 'kategori', 'komentar', 'tautan', 'tools', 'owner'])->findOrFail($id);
 
         return view('portofolio.view', compact('portofolio'));
     }
 
     public function edit($id)
     {
-        $portofolio = Portofolio::with(['gambar', 'kategoris', 'taggedUsers'])->findOrFail($id);
+        $portofolio = Portofolio::with(['gambar', 'kategori', 'komentar', 'tautan', 'tools'])->findOrFail($id);
 
         // Pastikan hanya pemilik yang bisa mengedit
         if ($portofolio->id_pengguna !== auth()->id()) {
@@ -235,8 +343,27 @@ class PortofolioController extends Controller
         }
 
         // Ambil semua kategori
-        $semuaKategori = KategoriPortofolio::distinct('kategori_portofolio')->pluck('kategori_portofolio');
-
+        $semuaKategori = ['UI/UX Design', 'Website Development', 'Mobile Development', 'Game Development', 'Internet of Things', 'ML/AI', 'Blockchain', 'Cyber Security'];
         return view('portofolio.edit', compact('portofolio', 'semuaKategori'));
+    }
+
+    public function validatePortofolio($id)
+    {
+        $portofolio = Portofolio::findOrFail($id);
+
+        // Pastikan hanya admin yang bisa memvalidasi
+        if (!auth()->user()->hasRole('admin') || !auth()->user()->can('approve portofolio')) {
+            abort(403, 'Anda tidak memiliki izin untuk memvalidasi portofolio ini.');
+        }
+
+        try {
+            $portofolio->status_portofolio = 1; // Ubah status menjadi valid
+            $portofolio->save();
+
+            return redirect()->route('dashboard')->with('success', 'Portofolio berhasil divalidasi.');
+        } catch (\Exception $e) {
+            \Log::error('Gagal memvalidasi portofolio: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memvalidasi portofolio.');
+        }
     }
 }

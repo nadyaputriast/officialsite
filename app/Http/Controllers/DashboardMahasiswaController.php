@@ -11,12 +11,8 @@ class DashboardMahasiswaController
     public function index()
     {
         $dataOprek = OprekLokerProject::latest()->get();
-		$dataEvent = Event::latest()->get();
-		$dataPortofolio = Portofolio::with(['mahasiswa', 'dosen'])->where('status_portofolio', 'valid')->get();
-        // return view('dashboard', compact('dataOprek', 'dataEvent', 'dataPortofolio'));
-        return view('dashboard', [
-            'dataOprek' => $dataOprek,
-            'dataEvent' => $dataEvent,
-            'dataPortofolio' => $dataPortofolio,
-        ]);}
+        $dataEvent = Event::latest()->get();
+        $dataPortofolio = Portofolio::with(['mahasiswa', 'dosen'])->where('status_portofolio', 'valid')->get();
+        return view('dashboard', compact('dataOprek', 'dataEvent', 'dataPortofolio'));
+    }
 }

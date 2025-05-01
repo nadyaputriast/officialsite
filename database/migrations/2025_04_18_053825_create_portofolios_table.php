@@ -16,13 +16,15 @@ return new class extends Migration
             $table->unsignedBigInteger('id_pengguna');
             $table->string('nama_portofolio');
             $table->text('deskripsi_portofolio');
-            $table->string('tautan_portofolio');
             $table->json('kategori_portofolio')->nullable();
             $table->json('gambar_portofolio')->nullable();
-            $table->tinyInteger('status_portofolio')->default(0);
+            $table->json('tautan_portofolio')->nullable();
+            $table->json('tools_portofolio')->nullable();
+            $table->boolean('status_portofolio')->default(0);
             $table->integer('view_count')->default(0);
             $table->integer('banyak_upvote')->default(0);
             $table->integer('banyak_downvote')->default(0);
+            $table->string('dokumen_portofolio')->nullable();
             $table->timestamps();
 
             // foreign key

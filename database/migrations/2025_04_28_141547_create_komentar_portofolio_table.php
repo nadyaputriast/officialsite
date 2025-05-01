@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori_portofolio', function (Blueprint $table) {
-            $table->id('id_kategori_portofolio');
-            $table->enum('kategori_portofolio', ['UI/UX Design', 'Website Development', 'Mobile Development', 'Game Development', 'Internet of Things', 'ML/AI', 'Blockchain', 'Cyber Security']);
+        Schema::create('komentar_portofolio', function (Blueprint $table) {
+            $table->id('id_komentar_portofolio');
+            $table->text('komentar');
             $table->unsignedBigInteger('id_portofolio');
             $table->timestamps();
-            
+
+            // foreign key
             $table->foreign('id_portofolio')->references('id_portofolio')->on('portofolio')->onDelete('cascade');
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori_portofolio');
+        Schema::dropIfExists('komentar_portofolio');
     }
 };

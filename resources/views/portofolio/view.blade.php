@@ -8,25 +8,48 @@
 
                     {{-- Gambar --}}
                     @if ($portofolio->gambar->isNotEmpty())
-                        <div class="mb-4">
-                            <h4 class="font-bold">Gambar:</h4>
-                            <div class="grid grid-cols-3 gap-4">
+                        <div class="mb-6">
+                            <h4 class="font-semibold text-lg mb-3">Gambar Portofolio:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($portofolio->gambar as $gambar)
-                                    <img src="{{ Storage::url($gambar->gambar_portofolio) }}" alt="Gambar Portofolio"
-                                        class="rounded shadow">
+                                    <div class="overflow-hidden rounded-lg shadow hover:shadow-md transition-shadow">
+                                        <img src="{{ asset('storage/' . $gambar->gambar_portofolio) }}"
+                                            alt="Gambar Portofolio" class="w-full h-48 object-cover">
+                                    </div>
                                 @endforeach
                             </div>
                         </div>
                     @endif
 
                     {{-- Tautan --}}
-                    <div class="mb-4">
-                        <h4 class="font-bold">Tautan:</h4>
-                        <a href="{{ $portofolio->tautan_portofolio }}" target="_blank" rel="noopener noreferrer"
-                            class="text-blue-500 underline hover:text-blue-700">
-                            Kunjungi Proyek
-                        </a>
-                    </div>
+                    @if ($portofolio->tautan->isNotEmpty())
+                        <div class="mb-4">
+                            <h4 class="font-bold">Tautan:</h4>
+                            <ul class="list-disc pl-5">
+                                @foreach ($portofolio->tautan as $tautan)
+                                    <li>
+                                        <a href="{{ $tautan->tautan_portofolio }}" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-blue-500 underline hover:text-blue-700">
+                                            {{ $tautan->tautan_portofolio }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Tools --}}
+                    @if ($portofolio->tools->isNotEmpty())
+                        <div class="mb-4">
+                            <h4 class="font-bold">Tools:</h4>
+                            <ul class="list-disc pl-5">
+                                @foreach ($portofolio->tools as $tool)
+                                    <li>{{ $tool->tools_portofolio }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     {{-- Pembuat --}}
                     <div class="mb-4">
@@ -49,17 +72,28 @@
                     </div>
 
                     {{-- Kategori --}}
-                    @if ($portofolio->kategoris->isNotEmpty())
+                    @if ($portofolio->kategori->isNotEmpty())
                         <div class="mb-4">
                             <h4 class="font-bold">Kategori:</h4>
                             <ul>
-                                @foreach ($portofolio->kategoris as $kategori)
+                                @foreach ($portofolio->kategori as $kategori)
                                     <li>{{ $kategori->kategori_portofolio }}</li>
                                 @endforeach
                             </ul>
                         </div>
                     @endif
 
+                    {{-- Dokumen --}}
+                    @if ($portofolio->dokumen_portofolio)
+                        <div class="mb-4">
+                            <h4 class="font-bold">Dokumen:</h4>
+                            <a href="{{ asset('storage/' . $portofolio->dokumen_portofolio) }}" target="_blank"
+                                class="text-blue-500 underline hover:text-blue-700">
+                                Lihat Dokumen
+                            </a>
+                        </div>
+                    @endif
+                    
                     {{-- Tombol Edit --}}
                     @if (auth()->id() === $portofolio->id_pengguna)
                         <a href="{{ route('portofolio.edit', $portofolio->id_portofolio) }}"

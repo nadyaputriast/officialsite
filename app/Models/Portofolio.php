@@ -20,29 +20,13 @@ class Portofolio extends Model
         'nama_portofolio',
         'deskripsi_portofolio',
         'status_portofolio',
-        'tautan_portofolio',
         'view_count',
         'banyak_upvote',
         'banyak_downvote',
+        'dokumen_portofolio',
     ];
 
-    public function dosen()
-    {
-        return $this->belongsToMany(Dosen::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna');
-    }
-
-    public function mahasiswa()
-    {
-        return $this->belongsToMany(Mahasiswa::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna');
-    }
-
-    // public function users()
-    // {
-    //     return $this->belongsTo(User::class, 'portofolio', 'id_portofolio', 'id_pengguna')
-    //         ->withTimestamps();
-    // }
-
-    public function kategoris()
+    public function kategori()
     {
         return $this->hasMany(KategoriPortofolio::class, 'id_portofolio');
     }
@@ -50,6 +34,21 @@ class Portofolio extends Model
     public function gambar()
     {
         return $this->hasMany(GambarPortofolio::class, 'id_portofolio');
+    }
+
+    public function komentar()
+    {
+        return $this->hasMany(KomentarPortofolio::class, 'id_portofolio');
+    }
+
+    public function tautan()
+    {
+        return $this->hasMany(TautanPortofolio::class, 'id_portofolio');
+    }
+
+    public function tools()
+    {
+        return $this->hasMany(ToolsPortofolio::class, 'id_portofolio');
     }
 
     public function index()

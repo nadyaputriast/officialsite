@@ -17,28 +17,29 @@ class OprekLokerProject extends Model
     protected $fillable = [
         'id_oprek',
         'nama_project',
-		'deskripsi_project',
-		'deadline_project',
-		'penyelenggara',
-		'tautan_oprek',
-        'thumbnail_oprek',
-		'kode_admin',
-		'nip',
-		'nim',
+        'deskripsi_project',
+        'deadline_project',
+        'penyelenggara',
+        'nama_penyelenggara',
+        'output_project',
+        'kategori_project',
+        'tautan_project',
+        'flyer_informasi',
+        'status_project',
+        'id_pengguna',
     ];
 
-    public function admin()
-    {
-        return $this->belongsTo(Admin::class, 'kode_admin', 'kode_admin');
-    }
-	
-	public function dosen()
-	{
-		return $this->belongsTo(Dosen::class, 'nip', 'nip');
-	}
+    protected $casts = [
+        'status_project' => 'boolean',
+    ];   
 
-    public function mahasiswa()
+    public function owner()
     {
-        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
+        return $this->belongsTo(User::class, 'id_pengguna');
+    }
+
+    public function kualifikasi()
+    {
+        return $this->hasMany(KualifikasiOprek::class, 'id_oprek', 'id_oprek');
     }
 }

@@ -27,9 +27,9 @@ class Mahasiswa extends Model
         return $this->hasMany(Event::class, 'nim', 'nim');
     }
 
-    public function oprek_loker_project()
+    public function oprekProjects()
     {
-        return $this->hasMany(OprekLokerProject::class, 'nim', 'nim');
+        return $this->hasMany(OprekLokerProject::class, 'kode_admin', 'kode_admin');
     }
 
     public function pengabdian()

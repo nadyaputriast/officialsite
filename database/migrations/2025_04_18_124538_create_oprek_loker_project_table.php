@@ -16,18 +16,18 @@ return new class extends Migration
             $table->string('nama_project');
             $table->text('deskripsi_project');
             $table->date('deadline_project');
-            $table->string('penyelenggara');
-            $table->string('tautan_oprek');
-            $table->string('thumbnail_oprek');
-            $table->unsignedBigInteger('kode_admin')->nullable();
-            $table->unsignedBigInteger('nip')->nullable();
-            $table->unsignedBigInteger('nim')->nullable();
+            $table->enum('penyelenggara', ['Dosen', 'Mahasiswa', 'Organisasi', 'Eksternal']);
+            $table->string('nama_penyelenggara');
+            $table->enum('kategori_project', ['Penelitian', 'Pengembangan Aplikasi', 'Pengabdian Masyarakat', 'Inisiatif Pribadi']);
+            $table->enum('output_project', ['Website', 'Mobile Apps', 'API Development', 'Game', 'Machine Learning/AI Project', 'Cyber Security', 'Automation', 'Embedded System']);
+            $table->string('tautan_project');
+            $table->string('flyer_informasi')->nullable();
+            $table->boolean('status_project')->default(0);
+            $table->unsignedBigInteger('id_pengguna')->nullable();
             $table->timestamps();
 
             // foreign key
-            $table->foreign('kode_admin')->references('kode_admin')->on('admin')->onDelete('cascade');
-            $table->foreign('nip')->references('nip')->on('dosen')->onDelete('cascade');
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

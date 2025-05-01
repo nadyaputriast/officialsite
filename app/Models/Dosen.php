@@ -23,9 +23,9 @@ class Dosen extends Model
         return $this->belongsTo(User::class, 'id_pengguna', 'id_pengguna');
     }
 
-    public function oprek_loker_project()
+    public function oprekProjects()
     {
-        return $this->hasMany(OprekLokerProject::class, 'nip', 'nip');
+        return $this->hasMany(OprekLokerProject::class, 'kode_admin', 'kode_admin');
     }
 
     public function pengabdian()

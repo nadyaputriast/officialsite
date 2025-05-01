@@ -23,6 +23,6 @@ class KategoriPortofolio extends Model
     // Define relationships if needed
     public function portofolios()
     {
-        return $this->belongsToMany(Portofolio::class, 'kategori_portofolio', 'id_kategori_portofolio', 'id_portofolio');
+        return $this->belongsTo(Portofolio::class, 'kategori_portofolio', 'id_kategori_portofolio', 'id_portofolio');
     }
 }
