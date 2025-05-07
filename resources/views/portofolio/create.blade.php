@@ -34,8 +34,6 @@
                                 required>
                         </div>
 
-                        {{--['ML/AI', 'Blockchain', 'Cyber Security'];
- --}}
                         {{-- Kategori Portofolio --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
@@ -71,18 +69,19 @@
                                     <label for="iot" class="ml-3 text-sm text-gray-700">Internet of Things</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" name="kategori_portofolio[]" id="ml"
-                                        value="ML/AI"
+                                    <input type="checkbox" name="kategori_portofolio[]" id="ml" value="ML/AI"
                                         class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                     <label for="ml" class="ml-3 text-sm text-gray-700">ML/AI</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" name="kategori_portofolio[]" id="blockchain" value="BlockChain"
+                                    <input type="checkbox" name="kategori_portofolio[]" id="blockchain"
+                                        value="BlockChain"
                                         class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                     <label for="blockchain" class="ml-3 text-sm text-gray-700">Blockchain</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" name="kategori_portofolio[]" id="cybersecurity" value="Cyber Security"
+                                    <input type="checkbox" name="kategori_portofolio[]" id="cybersecurity"
+                                        value="Cyber Security"
                                         class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                     <label for="cybersecurity" class="ml-3 text-sm text-gray-700">Cyber Security</label>
                                 </div>
@@ -103,12 +102,19 @@
                         <div class="mb-4">
                             <label for="gambar_portofolio" class="block text-sm font-medium text-gray-700">Gambar
                                 Portofolio</label>
-                            <input type="file" name="gambar_portofolio[]" id="gambar_portofolio"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                required>
+                            <div id="gambar-container">
+                                <div class="flex items-center mb-2">
+                                    <input type="file" name="gambar_portofolio[]" id="gambar_portofolio"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        required>
+                                    <button type="button"
+                                        class="ml-2 px-3 py-1 bg-green-500 text-black rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                                        onclick="addGambar()">Add</button>
+                                </div>
+                            </div>
+
                             <p class="text-xs text-gray-500 mt-1">Unggah gambar (JPG, PNG, GIF). Maksimal 2MB per
                                 gambar.</p>
-                            <div id="image-preview" class="mt-2 grid grid-cols-3 gap-2"></div>
                         </div>
 
                         {{-- Tautan --}}
@@ -143,7 +149,7 @@
                             </div>
                         </div>
 
-                        {{-- Dokumen --}}
+                        {{-- Dokumen Pendukung --}}
                         <div class="mb-4">
                             <label for="dokumen_portofolio" class="block text-sm font-medium text-gray-700">Dokumen
                                 Portofolio</label>
@@ -166,7 +172,7 @@
                             class="px-4 py-c2 bg-blue-500 text-black rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan</button>
 
                         {{-- Tombol Kembali --}}
-                        <a href="{{ route('dashboard') }}" class="px-4 py-c2 text-white rounded">Kembali</a>
+                        <a href="{{ route('dashboard') }}" class="px-4 py-c2 text-black rounded">Kembali</a>
                     </form>
                 </div>
             </div>
@@ -276,6 +282,24 @@
         }
 
         function removeTools(button) {
+            const row = button.parentElement;
+            row.remove();
+        }
+
+        function addGambar() {
+            const container = document.getElementById('gambar-container');
+            const newRow = document.createElement('div');
+            newRow.classList.add('flex', 'items-center', 'mb-2');
+            newRow.innerHTML = `
+        <input type="file" name="gambar_portofolio[]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            accept="image/*" required>
+        <button type="button" class="ml-2 px-3 py-1 bg-red-500 text-black rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            onclick="removeGambar(this)">Remove</button>
+    `;
+            container.appendChild(newRow);
+        }
+
+        function removeGambar(button) {
             const row = button.parentElement;
             row.remove();
         }

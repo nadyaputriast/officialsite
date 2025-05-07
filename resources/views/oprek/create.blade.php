@@ -146,6 +146,8 @@
 
                         <button type="submit"
                             class="px-4 py-2 bg-blue-500 text-black rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan</button>
+                        
+                            <a href="{{ route('dashboard') }}" class="px-4 py-c2 text-black rounded">Kembali</a>
                     </form>
                 </div>
             </div>

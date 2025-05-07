@@ -23,13 +23,30 @@ class Pengabdian extends Model
         'pelaksana',
     ];
 
-    public function dosen()
+    public function owner()
     {
-        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa_pengabdian', 'id_pengabdian', 'nip');
+        return $this->belongsTo(User::class, 'id_pengguna');
     }
 
-    public function mahasiswa()
+    public function dokumentasi()
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa_pengabdian', 'id_pengabdian', 'nim');
+        return $this->hasMany(DokumentasiPengabdian::class, 'id_pengabdian');
+    }
+
+    public function taggedUsers()
+    {
+        return $this->belongsToMany(User::class, 'pengabdian_user_tags', 'id_pengabdian', 'id_pengguna')
+        ->withTimestamps();
+    }
+
+    public function index()
+    {
+        $dataPortofolio = Portofolio::where('status_portofolio', true)->get();
+        $users = User::all();
+
+        return view('dashboard', [
+            'dataPortofolio' => $dataPortofolio,
+            'users' => $users,
+        ]);
     }
 }

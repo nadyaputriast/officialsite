@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pengabdian', function (Blueprint $table) {
-            $table->id('id_pengabdian');
-            $table->string('judul_pengabdian');
-            $table->text('deskripsi_pengabdian');
-            $table->boolean('status_pengabdian')->default(false);
-            $table->date('tanggal_pengabdian');
-            $table->string('pelaksana');
+        Schema::create('prestasi_user_tags', function (Blueprint $table) {
+            $table->id('id_tag_prestasi');
+            $table->unsignedBigInteger('id_prestasi');
             $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 
-            // foreign key
+            // Foreign keys
+            $table->foreign('id_prestasi')->references('id_prestasi')->on('prestasi')->onDelete('cascade');
             $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pengabdian');
+        Schema::dropIfExists('prestasi_user_tags');
     }
 };

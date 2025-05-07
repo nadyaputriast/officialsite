@@ -18,8 +18,12 @@ return new class extends Migration
             $table->boolean('status_prestasi')->default(false);
             $table->date('tanggal_perolehan');
             $table->enum('tingkatan_prestasi', ['Regional', 'Nasional', 'Internasional']);
-            $table->enum('jenis_prestasi', ['Akademik', 'Non-Akademik']);
+            $table->enum('jenis_prestasi', ['Akademik', 'Non Akademik']);
+            $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
+
+            // foreign key
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

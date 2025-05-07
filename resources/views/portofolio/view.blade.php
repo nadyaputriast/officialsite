@@ -93,7 +93,51 @@
                             </a>
                         </div>
                     @endif
+
+                    {{-- Statistik --}}
+                    <div class="mb-4">
+                        <strong>Jumlah Dilihat:</strong> {{ $portofolio->view_count }} <br>
+                        <strong>Jumlah Suka:</strong> {{ $portofolio->banyak_upvote }} <br>
+                        <strong>Jumlah Tidak Suka:</strong> {{ $portofolio->banyak_downvote }}
+                    </div>
+
+                    {{-- Tombol Vote --}}
+                    <div class="flex space-x-4">
+                        <form action="{{ route('portofolio.upvote', $portofolio->id_portofolio) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                                👍 Suka
+                            </button>
+                        </form>
+                        <form action="{{ route('portofolio.downvote', $portofolio->id_portofolio) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                👎 Tidak Suka
+                            </button>
+                        </form>
+                    </div>
                     
+                    {{-- Komentar --}}
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold mb-4">Komentar</h3>
+
+                        {{-- Form Komentar --}}
+                        @include('portofolio.komentar.form')
+
+                        {{-- Daftar Komentar --}}
+                        @include('portofolio.komentar.list')
+                    </div>
+                    {{-- Validasi Admin --}}
+                    @if (auth()->user()->hasRole('admin') && $portofolio->status_portofolio == 0)
+                        <form action="{{ route('portofolio.validate', $portofolio->id_portofolio) }}" method="POST"
+                            class="inline">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">
+                                Validasi
+                            </button>
+                        </form>
+                    @endif
+
                     {{-- Tombol Edit --}}
                     @if (auth()->id() === $portofolio->id_pengguna)
                         <a href="{{ route('portofolio.edit', $portofolio->id_portofolio) }}"

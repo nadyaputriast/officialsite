@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('event_registration', function (Blueprint $table) {
-            $table->id('id_event_registration');
+        Schema::create('promo_event_internal', function (Blueprint $table) {
+            $table->id('id_promo_event');
+            $table->string('kode_promo');
+            $table->enum('jenis_promo', ['Persentase', 'Potongan Harga']);
+            $table->integer('nilai_promo');
+            $table->date('tanggal_mulai');
+            $table->date('tanggal_berakhir');
             $table->unsignedBigInteger('id_event');
-            $table->string('nomor_tiket')->nullable();
-            $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 
             // foreign key
             $table->foreign('id_event')->references('id_event')->on('event')->onDelete('cascade');
-            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('event_registration');
+        Schema::dropIfExists('promo_event_internal');
     }
 };

@@ -87,7 +87,7 @@ class User extends Authenticatable
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_registration');
+        return $this->hasMany(Event::class, 'event_registration');
     }
 
     public function portofolio()
@@ -115,4 +115,32 @@ class User extends Authenticatable
     {
         return $this->hasMany(OprekLokerProject::class, 'id_pengguna');
     }
+
+    public function prestasi()
+    {
+        return $this->hasMany(Prestasi::class, 'id_pengguna');
+    }
+
+    public function taggedPrestasi()
+    {
+        return $this->belongsToMany(Prestasi::class, 'prestasi_user_tags', 'id_pengguna', 'id_prestasi')
+            ->withTimestamps();
+    }
+
+    public function sertifikasi()
+    {
+        return $this->hasMany(Sertifikasi::class, 'id_pengguna');
+    }
+
+    public function pengabdian()
+    {
+        return $this->hasMany(Pengabdian::class, 'id_pengguna');
+    }
+
+    public function taggedPengabdian()
+    {
+        return $this->belongsToMany(Pengabdian::class, 'pengabdian_user_tags', 'id_pengguna', 'id_pengabdian')
+            ->withTimestamps();
+    }
+
 }

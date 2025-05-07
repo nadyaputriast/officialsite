@@ -21,18 +21,22 @@ class Sertifikasi extends Model
         'tanggal_sertifikasi',
         'masa_berlaku',
         'file_sertifikasi',
-        'nip',
+        'id_pengguna',
     ];
 
-    // Relasi ke tabel dosen
-    public function dosen()
+    public function owner()
     {
-        return $this->belongsTo(Dosen::class, 'nip', 'nip');
+        return $this->belongsTo(User::class, 'id_pengguna');
     }
 
-    // Mengecek kevalidan sertifikasi
-    public function isValid()
+    public function index()
     {
-        return $this->status_sertifikasi === 'valid';
+        $dataSerfifikasi = Sertifikasi::where('statusSerfifikasi', true)->get();
+        $users = User::all();
+
+        return view('dashboard', [
+            'dataSerfifikasi' => $dataSerfifikasi,
+            'users' => $users,
+        ]);
     }
 }

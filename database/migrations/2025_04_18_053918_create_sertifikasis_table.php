@@ -20,11 +20,11 @@ return new class extends Migration
             $table->date('tanggal_sertifikasi');
             $table->integer('masa_berlaku')->nullable();
             $table->string('file_sertifikasi');
-            $table->unsignedBigInteger('nip');
+            $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 
             // foreign key
-            $table->foreign('nip')->references('nip')->on('dosen')->onDelete('cascade');
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

@@ -203,7 +203,7 @@ class OprekProjectController extends Controller
     {
         $oprek = OprekLokerProject::findOrFail($id);
 
-        if (!auth()->user()->hasRole('admin') || !auth()->user()->can('approve oprek')) {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403, 'Anda tidak memiliki izin untuk memvalidasi oprek ini.');
         }
 

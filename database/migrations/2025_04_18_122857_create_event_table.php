@@ -23,13 +23,13 @@ return new class extends Migration
             $table->string('tautan_event')->nullable();
             $table->string('thumbnail_event');
             $table->integer('kuota_event')->nullable();
-            $table->unsignedBigInteger('kode_admin')->nullable();
-            $table->unsignedBigInteger('nim')->nullable();
+            $table->boolean('status_event')->default(false);
+            $table->bigInteger('harga_event');
+            $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 
             // foreign key
-            $table->foreign('kode_admin')->references('kode_admin')->on('admin')->onDelete('cascade');
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

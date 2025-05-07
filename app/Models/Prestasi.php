@@ -22,15 +22,21 @@ class Prestasi extends Model
         'tanggal_perolehan',
         'tingkatan_prestasi',
         'jenis_prestasi',
+        'id_pengguna'
     ];
 
-    public function dosen()
+    public function owner()
     {
-        return $this->belongsToMany(Dosen::class, 'dosen_mahasiswa_prestasi', 'id_prestasi', 'nip');
+        return $this->belongsTo(User::class, 'id_pengguna');
     }
 
-    public function mahasiswa()
+    public function dokumentasi()
     {
-        return $this->belongsToMany(Mahasiswa::class, 'dosen_mahasiswa_prestasi', 'id_prestasi', 'nim');
+        return $this->hasMany(DokumentasiPrestasi::class, 'id_prestasi');
+    }
+
+    public function taggedUsers()
+    {
+        return $this->belongsToMany(User::class, 'prestasi_user_tags', 'id_prestasi', 'id_pengguna');
     }
 }

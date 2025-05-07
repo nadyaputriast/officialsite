@@ -329,7 +329,7 @@ class PortofolioController extends Controller
     public function show($id)
     {
         $portofolio = Portofolio::with(['gambar', 'kategori', 'komentar', 'tautan', 'tools', 'owner'])->findOrFail($id);
-
+        $portofolio->increment('view_count');
         return view('portofolio.view', compact('portofolio'));
     }
 
@@ -352,7 +352,7 @@ class PortofolioController extends Controller
         $portofolio = Portofolio::findOrFail($id);
 
         // Pastikan hanya admin yang bisa memvalidasi
-        if (!auth()->user()->hasRole('admin') || !auth()->user()->can('approve portofolio')) {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403, 'Anda tidak memiliki izin untuk memvalidasi portofolio ini.');
         }
 
@@ -366,4 +366,24 @@ class PortofolioController extends Controller
             return back()->with('error', 'Gagal memvalidasi portofolio.');
         }
     }
+
+    public function upvote($id)
+{
+    $portofolio = Portofolio::findOrFail($id);
+
+    // Tambahkan upvote
+    $portofolio->increment('banyak_upvote');
+
+    return redirect()->route('portofolio.show', $id)->with('success', 'Upvote berhasil ditambahkan.');
+}
+
+public function downvote($id)
+{
+    $portofolio = Portofolio::findOrFail($id);
+
+    // Tambahkan downvote
+    $portofolio->increment('banyak_downvote');
+
+    return redirect()->route('portofolio.show', $id)->with('success', 'Downvote berhasil ditambahkan.');
+}
 }

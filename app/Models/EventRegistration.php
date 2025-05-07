@@ -13,6 +13,7 @@ class EventRegistration extends Model
     protected $primaryKey = 'id_event_registration';
     
     protected $fillable = [
+        'nomor_tiket',
         'id_event',
         'id_pengguna'
     ];

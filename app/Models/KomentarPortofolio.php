@@ -13,17 +13,23 @@ class KomentarPortofolio extends Model
     protected $primaryKey = 'id_komentar_portofolio';
     public $incrementing = true;
     protected $keyType = 'int';
-        
+
     protected $fillable = [
         'id_komentar_portofolio',
-        'komentar_portofolio',
-        'id_portofolio'
+        'komentar',
+        'id_portofolio',
+        'id_pengguna'
     ];
-    
+
     // Define relationships if needed
-    public function portofolios()
+    public function portofolio()
     {
         return $this->belongsTo(OprekLokerProject::class, 'id_portofolio', 'id_portofolio');
+    }
+
+    public function pengguna()
+    {
+        return $this->belongsTo(User::class, 'id_pengguna', 'id_pengguna');
     }
 
     public function lampiranKomentar()

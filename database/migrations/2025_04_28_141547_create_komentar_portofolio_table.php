@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id('id_komentar_portofolio');
             $table->text('komentar');
             $table->unsignedBigInteger('id_portofolio');
+            $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 
             // foreign key
             $table->foreign('id_portofolio')->references('id_portofolio')->on('portofolio')->onDelete('cascade');
+            $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');
         });
     }
 

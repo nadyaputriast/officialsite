@@ -25,23 +25,24 @@ class Event extends Model
         'nama_penyelenggara',
         'tautan_event',
         'kuota_event',
+        'harga_event',
         'thumbnail_event',
-        'kode_admin',
-        'nim',
+        'status_event',
+        'id_pengguna',
     ];
 
-    public function admin()
+    public function owner()
     {
-        return $this->belongsTo(Admin::class, 'kode_admin', 'kode_admin');
-    }
-
-    public function mahasiswa()
-    {
-        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
+        return $this->belongsTo(User::class, 'id_pengguna');
     }
 
     public function participants()
     {
-        return $this->belongsToMany(User::class, 'event_registration');
+        return $this->hasMany(User::class, 'event_registration');
+    }
+
+    public function promo()
+    {
+        return $this->hasOne(PromoEventInternal::class, 'id_event', 'id_event');
     }
 }

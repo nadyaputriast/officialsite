@@ -21,7 +21,7 @@ class LampiranKomentar extends Model
     ];
 
     // Define relationships if needed
-    public function komentar()
+    public function komentarPortofolio()
     {
         return $this->belongsTo(KomentarPortofolio::class, 'id_komentar_portofolio', 'id_komentar_portofolio');
     }
