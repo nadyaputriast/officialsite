@@ -72,4 +72,9 @@ class Portofolio extends Model
         return $this->belongsToMany(User::class, 'portofolio_user_tags', 'id_portofolio', 'id_pengguna')
             ->withTimestamps();
     }
+
+    public function votes()
+    {
+        return $this->hasMany(PortofolioVote::class, 'id_portofolio', 'id_portofolio');
+    }
 }

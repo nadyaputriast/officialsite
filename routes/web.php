@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\OprekProjectController;
 use App\Http\Controllers\PortofolioController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\KomentarPortofolioController;
 use App\Http\Controllers\PrestasiController;
@@ -22,8 +23,6 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
-
-// Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/portofolio/create', [PortofolioController::class, 'create'])->name('portofolio.create');
@@ -63,6 +62,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/event/{id_event}', [EventController::class, 'show'])->name('event.show');
     Route::get('/event/{id_event}/edit', [EventController::class, 'edit'])->name('event.edit');
     Route::put('/event/{id_event}', [EventController::class, 'update'])->name('event.update');
+
+    Route::get('/download/create', [DownloadController::class, 'create'])->name('download.create');
+    Route::post('/download', [DownloadController::class, 'store'])->name('download.store');
+    Route::get('/download/{id}/edit', [DownloadController::class, 'edit'])->name('download.edit');
+    Route::put('/download/{id}', [DownloadController::class, 'update'])->name('download.update');
+    Route::get('/download/{id}', [DownloadController::class, 'show'])->name('download.show');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -86,6 +91,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('pengabdian/{id}/validate', [PengabdianController::class, 'validatePengabdian'])->name('pengabdian.validate');
     Route::post('/sertifikasi/{id}/validate', [SertifikasiController::class, 'validateSertifikasi'])->name('sertifikasi.validate');
     Route::post('/event/{id_event}/validate', [EventController::class, 'validateEvent'])->name('event.validate');
+    Route::post('/download/{id}/validate', [DownloadController::class, 'validateDownload'])->name('download.validate');
 });
 
 

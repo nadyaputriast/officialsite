@@ -84,7 +84,7 @@
                     @endif
 
                     {{-- Dokumen --}}
-                    @if ($portofolio->dokumen_portofolio)
+                    @if (!empty($portofolio->dokumen_portofolio))
                         <div class="mb-4">
                             <h4 class="font-bold">Dokumen:</h4>
                             <a href="{{ asset('storage/' . $portofolio->dokumen_portofolio) }}" target="_blank"
@@ -92,6 +92,8 @@
                                 Lihat Dokumen
                             </a>
                         </div>
+                    @else
+                        <p>Dokumen tidak tersedia.</p>
                     @endif
 
                     {{-- Statistik --}}
@@ -102,21 +104,30 @@
                     </div>
 
                     {{-- Tombol Vote --}}
+                    @php
+                        $userVote = $portofolio->votes->where('id_pengguna', auth()->id())->first();
+                    @endphp
                     <div class="flex space-x-4">
                         <form action="{{ route('portofolio.upvote', $portofolio->id_portofolio) }}" method="POST">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                                👍 Suka
+                            <button type="submit"
+                                class="px-4 py-2 rounded hover:bg-green-600
+                                {{ $userVote && $userVote->jenis_vote === 'upvote' ? 'bg-green-500 text-white' : 'bg-gray-300 text-black' }}"
+                                {{ $userVote ? 'disabled' : '' }}>
+                                👍
                             </button>
                         </form>
                         <form action="{{ route('portofolio.downvote', $portofolio->id_portofolio) }}" method="POST">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                                👎 Tidak Suka
+                            <button type="submit"
+                                class="px-4 py-2 rounded hover:bg-red-600
+                                {{ $userVote && $userVote->jenis_vote === 'downvote' ? 'bg-red-500 text-white' : 'bg-gray-300 text-black' }}"
+                                {{ $userVote ? 'disabled' : '' }}>
+                                👎
                             </button>
                         </form>
                     </div>
-                    
+
                     {{-- Komentar --}}
                     <div class="mt-8">
                         <h3 class="text-lg font-semibold mb-4">Komentar</h3>

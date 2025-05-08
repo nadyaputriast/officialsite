@@ -6,6 +6,7 @@ use App\Models\Portofolio;
 use App\Models\User;
 use App\Models\KategoriPortofolio;
 use App\Models\GambarPortofolio;
+use App\Models\PortofolioVote;
 use App\Models\TautanPortofolio;
 use App\Models\ToolsPortofolio;
 use Illuminate\Http\Request;
@@ -58,18 +59,17 @@ class PortofolioController extends Controller
         DB::beginTransaction();
 
         try {
+            $path = $request->file('dokumen_portofolio')->store('portofolio_dokumen', 'public');
+
             // Menyimpan portofolio
             $portofolio = new Portofolio();
             $portofolio->nama_portofolio = $request->input('nama_portofolio');
             $portofolio->deskripsi_portofolio = $request->input('deskripsi_portofolio');
             $portofolio->id_pengguna = $user->id_pengguna;
-            $portofolio->save();
-
-            // Menyimpan dokumen jika ada
             if ($request->hasFile('dokumen_portofolio')) {
-                $path = $request->file('dokumen_portofolio')->store('portofolio_dokumen', 'public');
                 $portofolio->dokumen_portofolio = $path;
-            }
+            }            
+            $portofolio->save();
 
             // Menyimpan kategori portofolio
             if (!empty($request->input('kategori_portofolio'))) {
@@ -85,7 +85,7 @@ class PortofolioController extends Controller
             if ($request->hasFile('gambar_portofolio')) {
                 foreach ($request->file('gambar_portofolio') as $image) {
                     $path = $image->store('portofolio', 'public');
-                    
+
                     GambarPortofolio::create([
                         'gambar_portofolio' => $path, // Path akan tersimpan sebagai 'portofolio/filename.jpg'
                         'id_portofolio' => $portofolio->id_portofolio,
@@ -309,7 +309,7 @@ class PortofolioController extends Controller
             });
             ToolsPortofolio::where('id_portofolio', $id)->delete();
             TautanPortofolio::where('id_portofolio', $id)->delete();
-    
+
             // Hapus tagged users
             $portofolio->taggedUsers()->detach();
 
@@ -368,22 +368,54 @@ class PortofolioController extends Controller
     }
 
     public function upvote($id)
-{
-    $portofolio = Portofolio::findOrFail($id);
+    {
+        $portofolio = Portofolio::findOrFail($id);
 
-    // Tambahkan upvote
-    $portofolio->increment('banyak_upvote');
+        // Cek apakah user sudah memberikan vote
+        $existingVote = PortofolioVote::where('id_portofolio', $id)
+            ->where('id_pengguna', auth()->id())
+            ->first();
 
-    return redirect()->route('portofolio.show', $id)->with('success', 'Upvote berhasil ditambahkan.');
-}
+        if ($existingVote) {
+            return redirect()->route('portofolio.show', $id)->with('error', 'Anda sudah memberikan vote.');
+        }
 
-public function downvote($id)
-{
-    $portofolio = Portofolio::findOrFail($id);
+        // Tambahkan upvote
+        PortofolioVote::create([
+            'id_portofolio' => $id,
+            'id_pengguna' => auth()->id(),
+            'jenis_vote' => 'upvote',
+        ]);
 
-    // Tambahkan downvote
-    $portofolio->increment('banyak_downvote');
+        // Tambahkan jumlah upvote di portofolio
+        $portofolio->increment('banyak_upvote');
 
-    return redirect()->route('portofolio.show', $id)->with('success', 'Downvote berhasil ditambahkan.');
-}
+        return redirect()->route('portofolio.show', $id)->with('success', 'Anda menyukai portofolio ini.');
+    }
+
+    public function downvote($id)
+    {
+        $portofolio = Portofolio::findOrFail($id);
+
+        // Cek apakah user sudah memberikan vote
+        $existingVote = PortofolioVote::where('id_portofolio', $id)
+            ->where('id_pengguna', auth()->id())
+            ->first();
+
+        if ($existingVote) {
+            return redirect()->route('portofolio.show', $id)->with('error', 'Anda sudah memberikan vote.');
+        }
+
+        // Tambahkan downvote
+        PortofolioVote::create([
+            'id_portofolio' => $id,
+            'id_pengguna' => auth()->id(),
+            'jenis_vote' => 'downvote',
+        ]);
+
+        // Tambahkan jumlah downvote di portofolio
+        $portofolio->increment('banyak_downvote');
+
+        return redirect()->route('portofolio.show', $id)->with('success', 'Anda tidak menyukai portofolio ini.');
+    }
 }

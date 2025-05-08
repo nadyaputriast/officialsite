@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Download;
 use App\Models\Event;
 use App\Models\OprekLokerProject;
 use App\Models\Portofolio;
@@ -22,6 +23,7 @@ class DashboardController extends Controller
             $dataPrestasi = Prestasi::latest()->paginate(10);
             $dataPengabdian = Pengabdian::latest()->paginate(10);
             $dataSertifikasi = Sertifikasi::latest()->paginate(10);
+            $dataDownload = Download::latest()->paginate(10);
         } else {
             $dataEvent = Event::where('status_event', 1)->latest()->paginate(10);
             $dataOprek = OprekLokerProject::where('status_project', 1)->latest()->paginate(10);
@@ -29,8 +31,9 @@ class DashboardController extends Controller
             $dataPrestasi = Prestasi::where('status_prestasi', 1)->latest()->paginate(10);
             $dataPengabdian = Pengabdian::where('status_pengabdian', 1)->latest()->paginate(10);
             $dataSertifikasi = Sertifikasi::where('status_sertifikasi', 1)->latest()->paginate(10);
+            $dataDownload = Download::where('status_download', 1)->latest()->paginate(10);
         }
 
-        return view('dashboard', compact('dataEvent', 'dataOprek', 'dataPortofolio', 'dataPrestasi', 'dataPengabdian', 'dataSertifikasi'));
+        return view('dashboard', compact('dataEvent', 'dataOprek', 'dataPortofolio', 'dataPrestasi', 'dataPengabdian', 'dataSertifikasi', 'dataDownload'));
     }
 }

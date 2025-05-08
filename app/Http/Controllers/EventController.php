@@ -28,6 +28,10 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'waktu_event' => $request->input('waktu_event') . ':00',
+        ]);
+        
         $request->validate([
             'nama_event' => 'required|string|max:255',
             'jenis_event' => 'required|string|in:seminar,workshop,bootcamp,pameran,konferensi',
@@ -113,6 +117,10 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
+        $request->merge([
+            'waktu_event' => $request->input('waktu_event') . ':00',
+        ]);
+        
         $request->validate([
             'nama_event' => 'required|string|max:255',
             'jenis_event' => 'required|string|in:seminar,workshop,bootcamp,pameran,konferensi',

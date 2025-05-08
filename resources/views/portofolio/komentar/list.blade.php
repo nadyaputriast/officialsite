@@ -3,7 +3,7 @@
     @forelse ($portofolio->komentar as $komentar)
         <div class="mb-4 p-4 bg-gray-100 rounded shadow">
             <p class="text-sm text-gray-700">
-                <strong>{{ $komentar->pengguna->name ?? 'Anonim' }}</strong> {{-- Tampilkan nama pengguna --}}
+                <strong>{{ $komentar->pengguna->nama_pengguna ?? 'Anonim' }}</strong> {{-- Tampilkan nama pengguna --}}
                 <span class="text-gray-500 text-xs">{{ $komentar->created_at->diffForHumans() }}</span>
             </p>
             <p class="text-sm text-gray-700">{{ $komentar->komentar }}</p>
