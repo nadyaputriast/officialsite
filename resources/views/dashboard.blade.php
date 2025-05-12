@@ -3,6 +3,9 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard ' . ucfirst(Auth::user()->getRoleNames()->first())) }}
         </h2>
+
+        {{-- Banner --}}
+        <x-banner-component />
     </x-slot>
 
     {{-- Informasi Event --}}
