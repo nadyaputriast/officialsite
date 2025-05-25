@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notifikasi;
 use App\Models\Sertifikasi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -182,10 +183,37 @@ class SertifikasiController extends Controller
             $sertifikasi->status_sertifikasi = 1; // Ubah status menjadi valid
             $sertifikasi->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Sertifikasi "' . $sertifikasi->nama_sertifikasi . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $sertifikasi->id_sertifikasi,
+                'notifiable_type' => 'sertifikasi',
+                'id_pengguna' => $sertifikasi->id_pengguna,
+            ]);
+
             return redirect()->route('dashboard')->with('success', 'Sertifikasi berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi sertifikasi: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi sertifikasi.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $sertifikasi = Sertifikasi::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user sertifikasi
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $sertifikasi->id_sertifikasi,
+            'notifiable_type' => 'sertifikasi',
+            'id_pengguna' => $sertifikasi->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

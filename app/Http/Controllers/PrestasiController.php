@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Prestasi;
 use App\Models\DokumentasiPrestasi;
+use App\Models\Notifikasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -253,10 +254,37 @@ class PrestasiController extends Controller
             $prestasi->status_prestasi = 1; // Ubah status menjadi valid
             $prestasi->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Oprek "' . $prestasi->nama_prestasi . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $prestasi->id_prestasi,
+                'notifiable_type' => 'prestasi',
+                'id_pengguna' => $prestasi->id_pengguna,
+            ]);
+
             return redirect()->route('dashboard')->with('success', 'prestasi berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi prestasi: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi prestasi.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $prestasi = Prestasi::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user prestasi
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $prestasi->id_prestasi,
+            'notifiable_type' => 'prestasi',
+            'id_pengguna' => $prestasi->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

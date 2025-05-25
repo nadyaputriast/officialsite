@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OprekLokerProject;
 use App\Models\KualifikasiOprek;
+use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -211,10 +212,37 @@ class OprekProjectController extends Controller
             $oprek->status_project = 1; // Ubah status menjadi valid
             $oprek->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Oprek "' . $oprek->nama_project . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $oprek->id_oprek,
+                'notifiable_type' => 'oprek_loker_project',
+                'id_pengguna' => $oprek->id_pengguna,
+            ]);
+
             return redirect()->route('dashbodard')->with('success', 'Oprek berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi oprek: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi oprek.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $oprek = OprekLokerProject::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user oprek
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $oprek->id_oprek,
+            'notifiable_type' => 'oprek_loker_project',
+            'id_pengguna' => $oprek->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

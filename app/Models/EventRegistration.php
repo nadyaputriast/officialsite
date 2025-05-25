@@ -11,7 +11,7 @@ class EventRegistration extends Model
 
     protected $table = 'event_registration';
     protected $primaryKey = 'id_event_registration';
-    
+
     protected $fillable = [
         'nomor_tiket',
         'id_event',
@@ -28,5 +28,10 @@ class EventRegistration extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'id_pengguna', 'id_pengguna');
+    }
+
+    public function pembayaran()
+    {
+        return $this->hasOne(PembayaranEvent::class, 'id_event_registration', 'id_event_registration');
     }
 }

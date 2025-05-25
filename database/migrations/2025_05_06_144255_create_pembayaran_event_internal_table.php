@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_pembayaran_event');
             $table->string('bukti_pembayaran');
             $table->unsignedBigInteger('id_promo_event')->nullable();
+            $table->boolean('status_validasi')->default(false);
             $table->unsignedBigInteger('id_event_registration');
             $table->timestamps();
 

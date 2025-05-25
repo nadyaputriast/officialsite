@@ -36,13 +36,18 @@ class Event extends Model
         return $this->belongsTo(User::class, 'id_pengguna');
     }
 
-    public function participants()
-    {
-        return $this->hasMany(User::class, 'event_registration');
-    }
+    // public function participants()
+    // {
+    //     return $this->hasMany(User::class, 'event_registration');
+    // }
 
     public function promo()
     {
         return $this->hasOne(PromoEventInternal::class, 'id_event', 'id_event');
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(EventRegistration::class, 'id_event', 'id_event');
     }
 }

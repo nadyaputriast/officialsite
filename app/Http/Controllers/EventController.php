@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Notifikasi;
 use App\Models\PromoEventInternal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class EventController extends Controller
         $request->merge([
             'waktu_event' => $request->input('waktu_event') . ':00',
         ]);
-        
+
         $request->validate([
             'nama_event' => 'required|string|max:255',
             'jenis_event' => 'required|string|in:seminar,workshop,bootcamp,pameran,konferensi',
@@ -41,6 +42,7 @@ class EventController extends Controller
             'penyelenggara_event' => 'required|string|in:internal,eksternal',
             'nama_penyelenggara' => 'required|string|max:255',
             'harga_event' => 'required|numeric|min:0',
+            'nilai_promo' => 'nullable|integer|min:0',
             'tautan_event' => 'nullable|url|required_if:penyelenggara_event,eksternal',
             'kuota_event' => 'nullable|integer|min:1',
             'kode_promo' => 'nullable|string|max:50',
@@ -63,6 +65,7 @@ class EventController extends Controller
                 'penyelenggara_event',
                 'nama_penyelenggara',
                 'harga_event',
+                'nilai_promo',
                 'tautan_event',
                 'kuota_event'
             ]));
@@ -79,10 +82,18 @@ class EventController extends Controller
 
             // Simpan promo jika event internal
             if ($request->penyelenggara_event === 'internal' && $request->kode_promo) {
+                $jenisPromo = $request->nilai_promo > 100 ? 'Potongan Harga' : 'Persentase';
+                if ($jenisPromo === 'Persentase') {
+                    $hargaPromo = ($request->harga_event * (100 - $request->nilai_promo)) / 100;
+                } else {
+                    $hargaPromo = $request->harga_event - $request->nilai_promo;
+                }
+
                 $event->promo()->create([
                     'kode_promo' => $request->kode_promo,
-                    'jenis_promo' => $request->harga_event > 100 ? 'Potongan Harga' : 'Persentase',
-                    'nilai_promo' => $request->harga_event > 100 ? $request->harga_event : min($request->harga_event, 100),
+                    'jenis_promo' => $jenisPromo,
+                    'nilai_promo' => $request->nilai_promo,
+                    'harga_promo' => $hargaPromo,
                     'tanggal_mulai' => $request->tanggal_mulai,
                     'tanggal_berakhir' => $request->tanggal_berakhir,
                 ]);
@@ -120,7 +131,7 @@ class EventController extends Controller
         $request->merge([
             'waktu_event' => $request->input('waktu_event') . ':00',
         ]);
-        
+
         $request->validate([
             'nama_event' => 'required|string|max:255',
             'jenis_event' => 'required|string|in:seminar,workshop,bootcamp,pameran,konferensi',
@@ -130,6 +141,7 @@ class EventController extends Controller
             'penyelenggara_event' => 'required|string|in:internal,eksternal',
             'nama_penyelenggara' => 'required|string|max:255',
             'harga_event' => 'required|numeric|min:0',
+            'nilai_promo' => 'nullable|integer|min:0',
             'tautan_event' => 'nullable|url|required_if:penyelenggara_event,eksternal',
             'kuota_event' => 'nullable|integer|min:1',
             'kode_promo' => 'nullable|string|max:50',
@@ -150,6 +162,7 @@ class EventController extends Controller
                 'penyelenggara_event',
                 'nama_penyelenggara',
                 'harga_event',
+                'nilai_promo',
                 'tautan_event',
                 'kuota_event'
             ]));
@@ -162,20 +175,29 @@ class EventController extends Controller
 
             // Update promo jika event internal
             if ($request->penyelenggara_event === 'internal') {
+                $jenisPromo = $request->nilai_promo > 100 ? 'Potongan Harga' : 'Persentase';
+                if ($jenisPromo === 'Persentase') {
+                    $hargaPromo = ($request->harga_event * (100 - $request->nilai_promo)) / 100;
+                } else {
+                    $hargaPromo = $request->harga_event - $request->nilai_promo;
+                }
+
                 $promo = $event->promo;
                 if ($promo) {
                     $promo->update([
                         'kode_promo' => $request->kode_promo,
-                        'jenis_promo' => $request->harga_event > 100 ? 'Potongan Harga' : 'Persentase',
-                        'nilai_promo' => $request->harga_event > 100 ? $request->harga_event : min($request->harga_event, 100),
+                        'jenis_promo' => $jenisPromo,
+                        'nilai_promo' => $request->nilai_promo,
+                        'harga_promo' => $hargaPromo,
                         'tanggal_mulai' => $request->tanggal_mulai,
                         'tanggal_berakhir' => $request->tanggal_berakhir,
                     ]);
                 } elseif ($request->kode_promo) {
                     $event->promo()->create([
                         'kode_promo' => $request->kode_promo,
-                        'jenis_promo' => $request->harga_event > 100 ? 'Potongan Harga' : 'Persentase',
-                        'nilai_promo' => $request->harga_event > 100 ? $request->harga_event : min($request->harga_event, 100),
+                        'jenis_promo' => $jenisPromo,
+                        'nilai_promo' => $request->nilai_promo,
+                        'harga_promo' => $hargaPromo,
                         'tanggal_mulai' => $request->tanggal_mulai,
                         'tanggal_berakhir' => $request->tanggal_berakhir,
                     ]);
@@ -218,9 +240,35 @@ class EventController extends Controller
             $event->status_event = 1;
             $event->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Event "' . $event->nama_event . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $event->id_event,
+                'notifiable_type' => 'event',
+                'id_pengguna' => $event->id_pengguna,
+            ]);
             return redirect()->route('dashboard')->with('success', 'Event berhasil divalidasi.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memvalidasi event.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $event = Event::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user event
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $event->id_event,
+            'notifiable_type' => 'event',
+            'id_pengguna' => $event->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

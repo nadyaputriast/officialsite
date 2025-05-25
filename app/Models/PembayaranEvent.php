@@ -31,4 +31,9 @@ class PembayaranEvent extends Model
     {
         return $this->belongsTo(PromoEventInternal::class, 'id_promo_event', 'id_promo_event');
     }
+
+    public function registration()
+    {
+        return $this->belongsTo(EventRegistration::class, 'id_event_registration', 'id_event_registration');
+    }
 }

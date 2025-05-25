@@ -6,6 +6,7 @@ use App\Models\Portofolio;
 use App\Models\User;
 use App\Models\KategoriPortofolio;
 use App\Models\GambarPortofolio;
+use App\Models\Notifikasi;
 use App\Models\PortofolioVote;
 use App\Models\TautanPortofolio;
 use App\Models\ToolsPortofolio;
@@ -360,6 +361,13 @@ class PortofolioController extends Controller
             $portofolio->status_portofolio = 1; // Ubah status menjadi valid
             $portofolio->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Portofolio "' . $portofolio->nama_portofolio . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $portofolio->id_portofolio,
+                'notifiable_type' => 'portofolio',
+                'id_pengguna' => $portofolio->id_pengguna,
+            ]);
+
             return redirect()->route('dashboard')->with('success', 'Portofolio berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi portofolio: ' . $e->getMessage());
@@ -417,5 +425,25 @@ class PortofolioController extends Controller
         $portofolio->increment('banyak_downvote');
 
         return redirect()->route('portofolio.show', $id)->with('success', 'Anda tidak menyukai portofolio ini.');
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $portofolio = Portofolio::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user portofolio
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $portofolio->id_portofolio,
+            'notifiable_type' => 'portofolio',
+            'id_pengguna' => $portofolio->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

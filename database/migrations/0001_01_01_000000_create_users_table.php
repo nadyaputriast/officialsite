@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('tanggal_lahir');
             $table->text('alamat');
             $table->text('role', ['mahasiswa', 'dosen']);
+            $table->boolean('status_validasi')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

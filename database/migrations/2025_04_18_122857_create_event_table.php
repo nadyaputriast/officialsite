@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('kuota_event')->nullable();
             $table->boolean('status_event')->default(false);
             $table->bigInteger('harga_event');
+            $table->integer('nilai_promo')->default(0);
             $table->unsignedBigInteger('id_pengguna');
             $table->timestamps();
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DokumentasiPengabdian;
+use App\Models\Notifikasi;
 use App\Models\Pengabdian;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -228,10 +229,37 @@ class PengabdianController extends Controller
             $pengabdian->status_pengabdian = 1; // Ubah status menjadi valid
             $pengabdian->save();
 
+            Notifikasi::create([
+                'isi_notifikasi' => 'Pengabdian "' . $pengabdian->judul_pengabdian . '" telah divalidasi oleh admin.',
+                'notifiable_id' => $pengabdian->id_pengabdian,
+                'notifiable_type' => 'pengabdian',
+                'id_pengguna' => $pengabdian->id_pengguna,
+            ]);
+
             return redirect()->route('dashboard')->with('success', 'pengabdian berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi pengabdian: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi pengabdian.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $pengabdian = Pengabdian::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user pengabdian
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $pengabdian->id_pengabdian,
+            'notifiable_type' => 'pengabdian',
+            'id_pengguna' => $pengabdian->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }
