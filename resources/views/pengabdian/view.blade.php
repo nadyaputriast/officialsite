@@ -56,15 +56,30 @@
                         @php
                             $allUsers = collect();
                             if ($pengabdian->owner) {
-                                $allUsers->push($pengabdian->owner->nama_pengguna); // Tambahkan owner
+                                $allUsers->push([
+                                    'nama' => $pengabdian->owner->nama_pengguna,
+                                    'id' => $pengabdian->owner->id_pengguna,
+                                ]);
                             }
                             if ($pengabdian->taggedUsers->isNotEmpty()) {
-                                $allUsers = $allUsers->merge($pengabdian->taggedUsers->pluck('nama_pengguna')); // Gabungkan dengan taggedUsers
+                                foreach ($pengabdian->taggedUsers as $tagged) {
+                                    $allUsers->push([
+                                        'nama' => $tagged->nama_pengguna,
+                                        'id' => $tagged->id_pengguna,
+                                    ]);
+                                }
                             }
                         @endphp
 
                         @if ($allUsers->isNotEmpty())
-                            {{ $allUsers->join(', ', ' dan ') }}
+                            @foreach ($allUsers as $i => $user)
+                                <a href="{{ route('profile.user', $user['id']) }}" class="text-blue-600 hover:underline">{{ $user['nama'] }}</a>
+                                @if ($i < $allUsers->count() - 2)
+                                    ,
+                                @elseif ($i == $allUsers->count() - 2)
+                                    dan
+                                @endif
+                            @endforeach
                         @else
                             Tidak ada pengguna terkait
                         @endif

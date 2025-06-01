@@ -57,15 +57,31 @@
                         @php
                             $allUsers = collect();
                             if ($portofolio->owner) {
-                                $allUsers->push($portofolio->owner->nama_pengguna); // Tambahkan owner
+                                $allUsers->push([
+                                    'nama' => $portofolio->owner->nama_pengguna,
+                                    'id' => $portofolio->owner->id_pengguna,
+                                ]);
                             }
                             if ($portofolio->taggedUsers->isNotEmpty()) {
-                                $allUsers = $allUsers->merge($portofolio->taggedUsers->pluck('nama_pengguna')); // Gabungkan dengan taggedUsers
+                                foreach ($portofolio->taggedUsers as $tagged) {
+                                    $allUsers->push([
+                                        'nama' => $tagged->nama_pengguna,
+                                        'id' => $tagged->id_pengguna,
+                                    ]);
+                                }
                             }
                         @endphp
 
                         @if ($allUsers->isNotEmpty())
-                            {{ $allUsers->join(', ', ' dan ') }}
+                            @foreach ($allUsers as $i => $user)
+                                <a href="{{ route('profile.user', $user['id']) }}"
+                                    class="text-blue-600 hover:underline">{{ $user['nama'] }}</a>
+                                @if ($i < $allUsers->count() - 2)
+                                    ,
+                                @elseif ($i == $allUsers->count() - 2)
+                                    dan
+                                @endif
+                            @endforeach
                         @else
                             Tidak ada pengguna terkait
                         @endif
@@ -74,12 +90,18 @@
                     {{-- Kategori --}}
                     @if ($portofolio->kategori->isNotEmpty())
                         <div class="mb-4">
-                            <h4 class="font-bold">Kategori:</h4>
-                            <ul>
+                            <h4 class="font-bold mb-2 flex items-center gap-2">Kategori:</h4>
+                            <div class="flex flex-wrap gap-2">
                                 @foreach ($portofolio->kategori as $kategori)
-                                    <li>{{ $kategori->kategori_portofolio }}</li>
+                                    <a href="{{ route('portofolio.index', ['kategori' => $kategori->kategori_portofolio]) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 hover:text-blue-900 transition font-medium">
+                                        {{ $kategori->kategori_portofolio }}
+                                    </a>
                                 @endforeach
-                            </ul>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Klik kategori untuk melihat portofolio serupa
+                            </div>
                         </div>
                     @endif
 
@@ -166,8 +188,8 @@
                             <span>-</span>
                         @else
                             @if (auth()->user()->hasRole('admin'))
-                                <form action="{{ route('portofolio.komentar', $portofolio->id_portofolio) }}" method="POST"
-                                    class="mb-2">
+                                <form action="{{ route('portofolio.komentar', $portofolio->id_portofolio) }}"
+                                    method="POST" class="mb-2">
                                     @csrf
                                     <textarea name="isi_notifikasi" class="w-full border rounded p-2 mb-2" required>{{ $notif->isi_notifikasi ?? '' }}</textarea>
                                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">

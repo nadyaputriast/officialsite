@@ -18,8 +18,7 @@
                     \App\Models\Prestasi::where('status_prestasi', 0)->count() +
                     \App\Models\Sertifikasi::where('status_sertifikasi', 0)->count() +
                     \App\Models\Download::where('status_download', 0)->count() +
-                    \App\Models\PembayaranEvent::where('status_validasi', 0)->count() +
-                    \App\Models\User::where('status_validasi', 0)->count();
+                    \App\Models\PembayaranEvent::where('status_validasi', 0)->count();
             } else {
                 // User: hitung notifikasi yang belum dibaca
                 $unreadCount = isset($notifs) ? collect($notifs)->where('is_read', 0)->count() : 0;
@@ -50,9 +49,8 @@
                     $pendingSertifikasi = \App\Models\Sertifikasi::where('status_sertifikasi', 0)->get();
                     $pendingDownload = \App\Models\Download::where('status_download', 0)->get();
                     $pendingPembayaran = \App\Models\PembayaranEvent::where('status_validasi', 0)->get();
-                    $pendingUser = \App\Models\User::where('status_validasi', 0)->get();
                 @endphp
-                @foreach ([$pendingEvents, $pendingOprek, $pendingPortofolio, $pendingPengabdian, $pendingPrestasi, $pendingSertifikasi, $pendingDownload, $pendingPembayaran, $pendingUser] as $pendingList)
+                @foreach ([$pendingEvents, $pendingOprek, $pendingPortofolio, $pendingPengabdian, $pendingPrestasi, $pendingSertifikasi, $pendingDownload, $pendingPembayaran] as $pendingList)
                     @foreach ($pendingList as $item)
                         <div class="flex justify-between items-center p-4 bg-yellow-100 text-yellow-900">
                             <div>
@@ -73,8 +71,6 @@
                                         Download: {{ $item->nama_download }}
                                     @elseif(isset($item->bukti_pembayaran))
                                         Pembayaran Event: {{ $item->registration->event->nama_event ?? '-' }}
-                                    @elseif(isset($item->nama_pengguna))
-                                        User: {{ $item->nama_pengguna }}
                                     @endif
                                 </div>
                                 <div class="text-xs mt-1">
@@ -101,8 +97,6 @@
                                             class="underline">Lihat Detail</a>
                                     @elseif(isset($item->id_pembayaran_event))
                                         <a href="#pembayaran-section" class="underline">Lihat Detail</a>
-                                    @elseif(isset($item->id_pengguna))
-                                        <a href="#user-section" class="underline">Lihat Detail</a>
                                     @endif
                                 </div>
                             </div>

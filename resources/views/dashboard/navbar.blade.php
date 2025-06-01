@@ -15,9 +15,6 @@
             <a href="#download-section" class="text-blue-700 font-semibold hover:underline">Download</a>
         @else
             <a href="#portofolio-section" class="text-blue-700 font-semibold hover:underline">Project</a>
-            <a href="#pengabdian-section" class="text-blue-700 font-semibold hover:underline">Pengabdian</a>
-            <a href="#prestasi-section" class="text-blue-700 font-semibold hover:underline">Prestasi</a>
-            <a href="#sertifikasi-section" class="text-blue-700 font-semibold hover:underline">Sertifikasi</a>
             <a href="#event-section" class="text-blue-700 font-semibold hover:underline">Event</a>
             <a href="#hiring-section" class="text-blue-700 font-semibold hover:underline">Hiring</a>
             <a href="#download-section" class="text-blue-700 font-semibold hover:underline">Download</a>

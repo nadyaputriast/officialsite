@@ -58,19 +58,35 @@
 
                     {{-- Peraih Prestasi --}}
                     <div class="mb-4">
-                        <h4 class="font-bold">Peraih</h4>
+                        <h4 class="font-bold">Peraih Prestasi</h4>
                         @php
                             $allUsers = collect();
                             if ($prestasi->owner) {
-                                $allUsers->push($prestasi->owner->nama_pengguna); // Tambahkan owner
+                                $allUsers->push([
+                                    'nama' => $prestasi->owner->nama_pengguna,
+                                    'id' => $prestasi->owner->id_pengguna,
+                                ]);
                             }
                             if ($prestasi->taggedUsers->isNotEmpty()) {
-                                $allUsers = $allUsers->merge($prestasi->taggedUsers->pluck('nama_pengguna')); // Gabungkan dengan taggedUsers
+                                foreach ($prestasi->taggedUsers as $tagged) {
+                                    $allUsers->push([
+                                        'nama' => $tagged->nama_pengguna,
+                                        'id' => $tagged->id_pengguna,
+                                    ]);
+                                }
                             }
                         @endphp
 
                         @if ($allUsers->isNotEmpty())
-                            {{ $allUsers->join(', ', ' dan ') }}
+                            @foreach ($allUsers as $i => $user)
+                                <a href="{{ route('profile.user', $user['id']) }}"
+                                    class="text-blue-600 hover:underline">{{ $user['nama'] }}</a>
+                                @if ($i < $allUsers->count() - 2)
+                                    ,
+                                @elseif ($i == $allUsers->count() - 2)
+                                    dan
+                                @endif
+                            @endforeach
                         @else
                             Tidak ada pengguna terkait
                         @endif

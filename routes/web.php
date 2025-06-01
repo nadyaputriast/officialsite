@@ -18,26 +18,34 @@ use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\SertifikasiController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PembayaranEventInternalController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WelcomeController;
 
-Route::view('/', 'welcome');
+Route::view('/', [WelcomeController::class, 'index'])->name('welcome');
 
-Route::view('profile', 'profile')
+Route::get('/profile', [ProfileController::class, 'ownProfile'])
     ->middleware(['auth'])
     ->name('profile');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/profile/{id}', [ProfileController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('profile.user');
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+    
 Route::middleware(['auth'])->group(function () {
     Route::get('/portofolio/create', [PortofolioController::class, 'create'])->name('portofolio.create');
+    Route::get('/portofolio', [PortofolioController::class, 'index'])->name('portofolio.index');
     Route::post('/portofolio', [PortofolioController::class, 'store'])->name('portofolio.store');
     Route::get('/portofolio/{id}', [PortofolioController::class, 'show'])->name('portofolio.show');
     Route::put('/portofolio/{id}', [PortofolioController::class, 'update'])->name('portofolio.update');
     Route::get('/portofolio/{id}/edit', [PortofolioController::class, 'edit'])->name('portofolio.edit');
+    Route::delete('/portofolio/{id}', [PortofolioController::class, 'destroy'])->name('portofolio.destroy');
     Route::post('/portofolio/{id}/upvote', [PortofolioController::class, 'upvote'])->name('portofolio.upvote');
     Route::post('/portofolio/{id}/downvote', [PortofolioController::class, 'downvote'])->name('portofolio.downvote');
     Route::post('portofolio/{id}/komentar', [PortofolioController::class, 'komentar'])->name('portofolio.komentar');
-
+    
     Route::get('/oprek', [OprekProjectController::class, 'create'])->name('oprek.create');
     Route::post('/oprek', [OprekProjectController::class, 'store'])->name('oprek.store');
     Route::get('/oprek/{id}', [OprekProjectController::class, 'show'])->name('oprek.show');

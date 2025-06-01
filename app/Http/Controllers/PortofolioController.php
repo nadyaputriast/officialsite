@@ -17,15 +17,44 @@ use Illuminate\Support\Facades\Storage;
 
 class PortofolioController extends Controller
 {
-    public function index()
-    {
-        $dataPortofolio = Portofolio::with(['owner', 'taggedUsers'])
-            ->where('status_portofolio', true)
-            ->get();
+    // public function index()
+    // {
+    //     $dataPortofolio = Portofolio::with(['owner', 'taggedUsers'])
+    //         ->where('status_portofolio', true)
+    //         ->get();
 
-        return view('dashboard', [
-            'dataPortofolio' => $dataPortofolio,
-        ]);
+    //     return view('dashboard', [
+    //         'dataPortofolio' => $dataPortofolio,
+    //     ]);
+    // }
+
+    public function index(Request $request)
+    {
+        $query = Portofolio::with(['owner', 'taggedUsers', 'kategori', 'gambar'])
+            ->where('status_portofolio', true);
+
+        // Filter berdasarkan kategori jika ada
+        if ($request->has('kategori') && !empty($request->kategori)) {
+            $query->whereHas('kategori', function ($q) use ($request) {
+                $q->where('kategori_portofolio', $request->kategori);
+            });
+        }
+
+        $portofolio = $query->latest()->paginate(12);
+
+        // Data yang dibutuhkan untuk compatibility dengan layout
+        $notifs = collect([]);
+        $events = collect([]);
+
+        // Kategori yang sedang dipilih untuk display
+        $selectedKategori = $request->kategori;
+
+        return view('portofolio.index', compact(
+            'portofolio',
+            'notifs',
+            'events',
+            'selectedKategori'
+        ));
     }
 
     public function create()
@@ -69,7 +98,7 @@ class PortofolioController extends Controller
             $portofolio->id_pengguna = $user->id_pengguna;
             if ($request->hasFile('dokumen_portofolio')) {
                 $portofolio->dokumen_portofolio = $path;
-            }            
+            }
             $portofolio->save();
 
             // Menyimpan kategori portofolio
