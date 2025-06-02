@@ -97,7 +97,7 @@
             @include('dashboard.download')
         @else
             {{-- SIDEBAR ADMIN --}}
-            <div x-data="{ tab: 'validasi' }" class="flex min-h-screen bg-gray-50">
+            <div x-data="{ tab: 'validasi_user' }" class="flex min-h-screen bg-gray-50">
                 {{-- Sidebar --}}
                 <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:block">
                     <div class="h-full flex flex-col py-6 px-4">
@@ -105,10 +105,15 @@
                             <span class="text-lg font-bold text-blue-700">Admin Panel</span>
                         </div>
                         <nav class="flex-1 space-y-2">
-                            <button @click="tab = 'validasi'"
-                                :class="tab === 'validasi' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                            <button @click="tab = 'validasi_user'"
+                                :class="tab === 'validasi_user' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
                                 class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition">
-                                <span>✅</span> Validasi Event User
+                                <span>✅</span> Validasi User
+                            </button>
+                            <button @click="tab = 'validasi_event'"
+                                :class="tab === 'validasi_event' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                                class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition">
+                                <span>✅</span> Validasi Event
                             </button>
                             <button @click="tab = 'user'"
                                 :class="tab === 'user' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
@@ -155,8 +160,11 @@
                 </aside>
                 {{-- Main Content --}}
                 <main class="flex-1 p-4 md:p-8">
-                    <div x-show="tab === 'validasi'">
+                    <div x-show="tab === 'validasi_event'">
                         @include('dashboard.validasi_event_user')
+                    </div>
+                    <div x-show="tab === 'validasi_user'">
+                        @include('dashboard.validasi_user')
                     </div>
                     <div x-show="tab === 'user'">
                         @include('dashboard.user')

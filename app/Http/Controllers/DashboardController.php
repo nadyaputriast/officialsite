@@ -14,6 +14,8 @@ use App\Models\Sertifikasi;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserValidatedMail;
 
 class DashboardController extends Controller
 {
@@ -32,12 +34,13 @@ class DashboardController extends Controller
         $filteredData = $this->applyFilters($request, $isAdmin);
 
         $paginatedEvents = $isAdmin ? $this->getPaginatedEventPayments() : null;
-        
+
         $users = $isAdmin ? User::with('roles')->orderBy('nama_pengguna')->paginate(15) : null;
 
         return view('dashboard', array_merge($baseData, $additionalData, $filteredData, [
             'paginatedEvents' => $paginatedEvents,
-            'users' => $users,]));
+            'users' => $users,
+        ]));
     }
 
     /**
@@ -402,5 +405,22 @@ class DashboardController extends Controller
         );
 
         return $paginatedEvents;
+    }
+
+    public function validasiUser(User $user)
+    {
+        // Hanya admin yang boleh validasi
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        // Update status validasi user
+        $user->status_validasi = true;
+        $user->save();
+
+        // Kirim email notifikasi ke user
+        Mail::to($user->email)->send(new UserValidatedMail($user));
+
+        return back()->with('success', 'User berhasil divalidasi dan email notifikasi telah dikirim.');
     }
 }

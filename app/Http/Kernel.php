@@ -46,6 +46,7 @@ class Kernel extends HttpKernel
 		'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
 		'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
 		'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+		// 'validasi.user' => \App\Http\Middleware\ValidasiUser::class, // <- HARUS ADA INI
 	];
 
 	protected $middlewareAliases = [
@@ -53,5 +54,4 @@ class Kernel extends HttpKernel
 		'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
 		'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
 	];
-	
 }
