@@ -72,7 +72,7 @@ class User extends Authenticatable
 
     public function admin()
     {
-        return $this->hasOne(Admin::class, 'kode_admin');
+        return $this->hasOne(Admin::class, 'id_pengguna');
     }
 
     public function mahasiswa()

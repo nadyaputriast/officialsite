@@ -6,17 +6,88 @@
             <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-semibold">Informasi Portofolio</h3>
-                    <a href="{{ route('portofolio.create') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                        + Tambah Portofolio
-                    </a>
                 </div>
 
                 @if (auth()->user()->hasRole('admin'))
-                    {{-- Tampilan untuk Admin (existing table) --}}
                     <table class="table-auto w-full border-collapse border border-gray-300">
-                        {{-- ... existing admin table code ... --}}
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Nama Portofolio</th>
+                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Deskripsi Portofolio
+                                </th>
+                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Komentar/Notifikasi
+                                </th>
+                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Status</th>
+                                <th class="border border-gray-300 px-4 py-2" colspan="2">Aksi</th>
+                            </tr>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2">Detail</th>
+                                <th class="border border-gray-300 px-4 py-2">Validasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($dataPortofolio as $portofolio)
+                                <tr>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        {{ $portofolio->nama_portofolio }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        {{ $portofolio->deskripsi_portofolio }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        @php
+                                            $notif = \App\Models\Notifikasi::where(
+                                                'notifiable_id',
+                                                $portofolio->id_portofolio,
+                                            )
+                                                ->where('notifiable_type', 'portofolio')
+                                                ->latest()
+                                                ->first();
+                                        @endphp
+                                        {{ $notif->isi_notifikasi ?? '-' }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        @if ($portofolio->status_portofolio == 1)
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                ✓ Sudah Divalidasi
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                ⏳ Belum Divalidasi
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ route('portofolio.show', $portofolio->id_portofolio) }}"
+                                            class="text-blue-500 hover:underline">Detail</a>
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        @if ($portofolio->status_portofolio == 0)
+                                            <form
+                                                action="{{ route('portofolio.validate', $portofolio->id_portofolio) }}"
+                                                method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="text-blue-500 hover:underline">Validasi</button>
+                                            </form>
+                                        @else
+                                            <span class="text-gray-500">Sudah Divalidasi</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray-500 py-4">Tidak ada informasi
+                                        portofolio saat ini.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                     </table>
+
+                    {{-- Paginasi untuk Admin --}}
+                    <div class="mt-4">
+                        {{ $dataPortofolio->links() }}
+                    </div>
                 @else
                     {{-- Tampilan untuk User Biasa dengan Search & Filter --}}
 
@@ -50,7 +121,8 @@
                                             Terakhir Upload</option>
                                         <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>
                                             Populer (Views)</option>
-                                        <option value="liked" {{ request('sort') == 'liked' ? 'selected' : '' }}>Paling
+                                        <option value="liked" {{ request('sort') == 'liked' ? 'selected' : '' }}>
+                                            Paling
                                             Disukai</option>
                                     </select>
                                 </div>

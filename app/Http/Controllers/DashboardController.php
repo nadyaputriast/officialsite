@@ -11,6 +11,7 @@ use App\Models\Portofolio;
 use App\Models\Pengabdian;
 use App\Models\Prestasi;
 use App\Models\Sertifikasi;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -23,14 +24,20 @@ class DashboardController extends Controller
 
         // Get base data berdasarkan role
         $baseData = $this->getBaseData($isAdmin);
-        
+
         // Get additional data
         $additionalData = $this->getAdditionalData();
-        
+
         // Apply filters to main sections
         $filteredData = $this->applyFilters($request, $isAdmin);
 
-        return view('dashboard', array_merge($baseData, $additionalData, $filteredData));
+        $paginatedEvents = $isAdmin ? $this->getPaginatedEventPayments() : null;
+        
+        $users = $isAdmin ? User::with('roles')->orderBy('nama_pengguna')->paginate(15) : null;
+
+        return view('dashboard', array_merge($baseData, $additionalData, $filteredData, [
+            'paginatedEvents' => $paginatedEvents,
+            'users' => $users,]));
     }
 
     /**
@@ -39,7 +46,7 @@ class DashboardController extends Controller
     private function getBaseData($isAdmin)
     {
         $paginationCount = 10;
-        
+
         if ($isAdmin) {
             return [
                 'dataPrestasi' => Prestasi::latest()->paginate($paginationCount),
@@ -261,7 +268,7 @@ class DashboardController extends Controller
                 break;
             case 'this_month':
                 $query->whereMonth($column, $today->month)
-                      ->whereYear($column, $today->year);
+                    ->whereYear($column, $today->year);
                 break;
             case 'upcoming':
                 $query->where($column, '>=', $today->toDateString());
@@ -371,5 +378,29 @@ class DashboardController extends Controller
         }
 
         return null;
+    }
+
+    private function getPaginatedEventPayments()
+    {
+        // Ambil semua pembayaran beserta relasi event dan user
+        $allPayments = \App\Models\PembayaranEvent::with(['registration.event', 'registration.user'])
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->registration->event->id_event ?? 0;
+            });
+
+        // Paginasi manual per event
+        $perPage = 20;
+        $currentPage = request('page', 1);
+        $events = $allPayments->values();
+        $paginatedEvents = new \Illuminate\Pagination\LengthAwarePaginator(
+            $events->forPage($currentPage, $perPage),
+            $events->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return $paginatedEvents;
     }
 }

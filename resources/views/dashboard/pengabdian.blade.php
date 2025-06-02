@@ -3,15 +3,15 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900">
-                <h3 class="text-lg font-semibold mb-4">Informasi Pengabdian</h3>
-                <a href="{{ route('pengabdian.create') }}" class="text-red-500 mb-4 inline-block">Tambah
-                    Pengabdian</a>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold">Informasi Pengabdian</h3>
+                </div>
+
                 @if (auth()->user()->hasRole('admin'))
-                    {{-- Tampilan untuk Admin --}}
                     <table class="table-auto w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Nama Pengabdian</th>
+                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Judul Pengabdian</th>
                                 <th class="border border-gray-300 px-4 py-2" rowspan="2">Deskripsi Pengabdian
                                 </th>
                                 <th class="border border-gray-300 px-4 py-2" rowspan="2">Komentar/Notifikasi
@@ -30,8 +30,7 @@
                                     <td class="border border-gray-300 px-4 py-2">
                                         {{ $pengabdian->judul_pengabdian }}</td>
                                     <td class="border border-gray-300 px-4 py-2">
-                                        {{ $pengabdian->deskripsi_pengabdian }}
-                                    </td>
+                                        {{ $pengabdian->deskripsi_pengabdian }}</td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         @php
                                             $notif = \App\Models\Notifikasi::where(
@@ -46,9 +45,15 @@
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         @if ($pengabdian->status_pengabdian == 1)
-                                            <span class="text-green-500">Sudah Divalidasi</span>
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                ✓ Sudah Divalidasi
+                                            </span>
                                         @else
-                                            <span class="text-red-500">Belum Divalidasi</span>
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                ⏳ Belum Divalidasi
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2">
@@ -80,7 +85,7 @@
 
                     {{-- Paginasi untuk Admin --}}
                     <div class="mt-4">
-                        {{ $dataPengabdian->links() }}
+                        {{ $dataPortofolio->links() }}
                     </div>
                 @else
                     {{-- Tampilan untuk User Biasa --}}
