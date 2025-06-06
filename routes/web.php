@@ -162,7 +162,7 @@ Route::middleware(['auth'])->prefix('sertifikasi')->name('sertifikasi.')->group(
 // Event Routes
 Route::prefix('event')->name('event.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
-    
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/show/{id}', [EventController::class, 'show'])->name('show');
         Route::get('/create', [EventController::class, 'create'])->name('create');
@@ -187,7 +187,8 @@ Route::prefix('event')->name('event.')->group(function () {
 Route::prefix('download')->name('download.')->group(function () {
     Route::get('/', [DownloadController::class, 'index'])->name('index');
     Route::get('/file/{id}', [DownloadController::class, 'downloadFile'])->name('file');
-    
+    Route::get('/{id}', [DownloadController::class, 'show'])->name('show'); // ← Tambahkan ini
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/create', [DownloadController::class, 'create'])->name('create');
         Route::post('/store', [DownloadController::class, 'store'])->name('store');
