@@ -145,6 +145,12 @@ class DownloadController extends Controller
         return view('download.show', compact('download'));
     }
 
+    public function download($id_download)
+    {
+        $file = Download::findOrFail($id_download);
+        return response()->download(storage_path('app/public/' . $file->file_konten));
+    }
+
     public function validateDownload($id)
     {
         $download = Download::findOrFail($id);

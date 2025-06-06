@@ -17,6 +17,7 @@ use App\Http\Controllers\SertifikasiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Middleware\ValidasiUser;
+use App\Models\OprekLokerProject;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::view('/', [WelcomeController::class, 'index'])->name('welcome');
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 /*
 |--------------------------------------------------------------------------
@@ -94,13 +95,17 @@ Route::middleware(['auth'])->prefix('portofolio')->name('portofolio.')->group(fu
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->prefix('oprek')->name('oprek.')->group(function () {
-    Route::get('/create', [OprekProjectController::class, 'create'])->name('create');
-    Route::post('/', [OprekProjectController::class, 'store'])->name('store');
-    Route::get('/{id}', [OprekProjectController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [OprekProjectController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [OprekProjectController::class, 'update'])->name('update');
-    Route::post('/{id}/komentar', [OprekProjectController::class, 'komentar'])->name('komentar');
+Route::prefix('oprek')->name('oprek.')->group(function () {
+    Route::get('/', [OprekProjectController::class, 'index'])->name('index');
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/show/{id}', [OprekProjectController::class, 'show'])->name('show');
+        Route::get('/create', [OprekProjectController::class, 'create'])->name('create');
+        Route::post('/store', [OprekProjectController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [OprekProjectController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [OprekProjectController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [OprekProjectController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*
@@ -154,20 +159,26 @@ Route::middleware(['auth'])->prefix('sertifikasi')->name('sertifikasi.')->group(
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->prefix('event')->name('event.')->group(function () {
-    Route::get('/create', [EventController::class, 'create'])->name('create');
-    Route::post('/', [EventController::class, 'store'])->name('store');
-    Route::get('/{id_event}', [EventController::class, 'show'])->name('show');
-    Route::get('/{id_event}/edit', [EventController::class, 'edit'])->name('edit');
-    Route::put('/{id_event}', [EventController::class, 'update'])->name('update');
-    Route::post('/{id}/komentar', [EventController::class, 'komentar'])->name('komentar');
+// Event Routes
+Route::prefix('event')->name('event.')->group(function () {
+    Route::get('/', [EventController::class, 'index'])->name('index');
     
-    // Event Registration
-    Route::get('/{id}/register', [EventRegistrationController::class, 'register'])->name('register');
-    Route::post('/{id}/register', [EventRegistrationController::class, 'store'])->name('register.store');
+    // Event Registration Routes - pindah ke EventRegistrationController
+    Route::get('/register/{id}', [EventRegistrationController::class, 'register'])->name('register');
+    Route::post('/register/{id}', [EventRegistrationController::class, 'store'])->name('register.store');
+    Route::post('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->name('cek.promo');
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/show/{id}', [EventController::class, 'show'])->name('show');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/store', [EventController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [EventController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [EventController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [EventController::class, 'destroy'])->name('destroy');
+    });
 });
 
-Route::get('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->middleware('auth');
+// Route::get('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
@@ -175,12 +186,17 @@ Route::get('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->midd
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->prefix('download')->name('download.')->group(function () {
-    Route::get('/create', [DownloadController::class, 'create'])->name('create');
-    Route::post('/', [DownloadController::class, 'store'])->name('store');
-    Route::get('/{id}', [DownloadController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [DownloadController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [DownloadController::class, 'update'])->name('update');
+Route::prefix('download')->name('download.')->group(function () {
+    Route::get('/', [DownloadController::class, 'index'])->name('index');
+    Route::get('/file/{id}', [DownloadController::class, 'downloadFile'])->name('file');
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/create', [DownloadController::class, 'create'])->name('create');
+        Route::post('/store', [DownloadController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [DownloadController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [DownloadController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [DownloadController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*
