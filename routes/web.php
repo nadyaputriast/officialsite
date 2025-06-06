@@ -163,11 +163,6 @@ Route::middleware(['auth'])->prefix('sertifikasi')->name('sertifikasi.')->group(
 Route::prefix('event')->name('event.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
     
-    // Event Registration Routes - pindah ke EventRegistrationController
-    Route::get('/register/{id}', [EventRegistrationController::class, 'register'])->name('register');
-    Route::post('/register/{id}', [EventRegistrationController::class, 'store'])->name('register.store');
-    Route::post('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->name('cek.promo');
-    
     Route::middleware(['auth'])->group(function () {
         Route::get('/show/{id}', [EventController::class, 'show'])->name('show');
         Route::get('/create', [EventController::class, 'create'])->name('create');
@@ -175,6 +170,9 @@ Route::prefix('event')->name('event.')->group(function () {
         Route::get('/edit/{id}', [EventController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [EventController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('/register/{id}', [EventRegistrationController::class, 'register'])->name('register');
+        Route::post('/register/{id}', [EventRegistrationController::class, 'store'])->name('register.store');
+        Route::post('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->name('cek.promo');
     });
 });
 
