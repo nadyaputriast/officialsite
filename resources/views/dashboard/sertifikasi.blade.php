@@ -63,7 +63,7 @@
                                     <td class="border border-gray-300 px-4 py-2">
                                         @if ($sertifikasi->status_sertifikasi == 0)
                                             <form
-                                                action="{{ route('sertifikasi.validate', $sertifikasi->id_sertifikasi) }}"
+                                                action="{{ route('admin.sertifikasi.validate', $sertifikasi->id_sertifikasi) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"

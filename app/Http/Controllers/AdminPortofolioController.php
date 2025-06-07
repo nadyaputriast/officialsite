@@ -9,7 +9,7 @@ class AdminPortofolioController extends Controller
     public function index()
     {
         // Ambil semua portofolio dengan status "nonvalid"
-        $portofolios = Portofolio::where('status_portofolio', 'nonvalid')->get();
+        $portofolios = Portofolio::where('status_portofolio', 1)->get();
 
         return view('admin.portofolio.index', compact('portofolios'));
     }

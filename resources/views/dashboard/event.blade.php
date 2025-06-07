@@ -64,7 +64,7 @@
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         @if ($event->status_event == 0)
-                                            <form action="{{ route('event.validate', $event->id_event) }}"
+                                            <form action="{{ route('admin.event.validate', $event->id_event) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->date('tanggal_lahir');
             $table->text('alamat');
-            $table->text('role', ['mahasiswa', 'dosen']);
+            $table->enum('role', ['mahasiswa', 'dosen', 'admin']);
             $table->boolean('status_validasi')->default(false);
             $table->rememberToken();
             $table->timestamps();

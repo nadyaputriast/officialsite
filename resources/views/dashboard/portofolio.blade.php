@@ -64,7 +64,7 @@
                                     <td class="border border-gray-300 px-4 py-2">
                                         @if ($portofolio->status_portofolio == 0)
                                             <form
-                                                action="{{ route('portofolio.validate', $portofolio->id_portofolio) }}"
+                                                action="{{ route('admin.portofolio.validate', $portofolio->id_portofolio) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"

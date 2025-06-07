@@ -70,6 +70,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.user');
 });
 
+Route::put('/profile', [App\Http\Controllers\UserController::class, 'update'])
+    ->name('profile.update')
+    ->middleware('auth');
+
+Route::put('/password', [App\Http\Controllers\UserController::class, 'updatePassword'])
+    ->name('password.update')
+    ->middleware('auth');
+
 /*
 |--------------------------------------------------------------------------
 | Portofolio Routes
@@ -242,4 +250,4 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/user/{id}/validate', [UserController::class, 'validateUser'])->name('user.validate');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__ . '/auth.php';    

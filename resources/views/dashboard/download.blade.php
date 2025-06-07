@@ -60,7 +60,7 @@
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2">
                                         @if ($download->status_download == 0)
-                                            <form action="{{ route('download.validate', $download->id_download) }}"
+                                            <form action="{{ route('admin.download.validate', $download->id_download) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"

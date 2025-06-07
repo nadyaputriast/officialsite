@@ -15,6 +15,7 @@ class Mahasiswa extends Model
     protected $fillable = [
         'id_pengguna',
         'nim',
+        'ktm',
     ];
 
     public function user()

@@ -222,7 +222,7 @@
 
                     {{-- Validasi Admin --}}
                     @if (auth()->user()->hasRole('admin') && $portofolio->status_portofolio == 0)
-                        <form action="{{ route('portofolio.validate', $portofolio->id_portofolio) }}" method="POST"
+                        <form action="{{ route('admin.portofolio.validate', $portofolio->id_portofolio) }}" method="POST"
                             class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">

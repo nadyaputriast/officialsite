@@ -146,7 +146,7 @@
                     
                     {{-- Validasi Admin --}}
                     @if (auth()->user()->hasRole('admin') && $pengabdian->status_pengabdian == 0)
-                        <form action="{{ route('pengabdian.validate', $pengabdian->id_pengabdian) }}" method="POST" class="inline">
+                        <form action="{{ route('admin.pengabdian.validate', $pengabdian->id_pengabdian) }}" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">
                                 Validasi

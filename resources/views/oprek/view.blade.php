@@ -129,7 +129,7 @@
 
                     {{-- Validasi Admin --}}
                     @if (auth()->user()->hasRole('admin') && $oprek->status_project == 0)
-                        <form action="{{ route('oprek.validate', $oprek->id_oprek) }}" method="POST" class="inline">
+                        <form action="{{ route('admin.oprek.validate', $oprek->id_oprek) }}" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">
                                 Validasi

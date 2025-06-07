@@ -219,7 +219,7 @@ class OprekProjectController extends Controller
                 'id_pengguna' => $oprek->id_pengguna,
             ]);
 
-            return redirect()->route('dashbodard')->with('success', 'Oprek berhasil divalidasi.');
+            return redirect()->route('dashboard')->with('success', 'Oprek berhasil divalidasi.');
         } catch (\Exception $e) {
             \Log::error('Gagal memvalidasi oprek: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi oprek.');

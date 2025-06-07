@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Filament\Models\Contracts\HasName;
 
 class User extends Authenticatable
 {
@@ -142,5 +141,4 @@ class User extends Authenticatable
         return $this->belongsToMany(Pengabdian::class, 'pengabdian_user_tags', 'id_pengguna', 'id_pengabdian')
             ->withTimestamps();
     }
-
 }

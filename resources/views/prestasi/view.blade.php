@@ -153,7 +153,7 @@
 
                     {{-- Validasi Admin --}}
                     @if (auth()->user()->hasRole('admin') && $prestasi->status_prestasi == 0)
-                        <form action="{{ route('prestasi.validate', $prestasi->id_prestasi) }}" method="POST"
+                        <form action="{{ route('admin.prestasi.validate', $prestasi->id_prestasi) }}" method="POST"
                             class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded hover:bg-green-600">

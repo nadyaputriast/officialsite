@@ -8,6 +8,7 @@ return new class extends Migration {
     {
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->id('nim');
+            $table->string('ktm');
             $table->unsignedBigInteger('id_pengguna')->unique();
             $table->timestamps();
             $table->foreign('id_pengguna')->references('id_pengguna')->on('users')->onDelete('cascade');

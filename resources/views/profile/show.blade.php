@@ -52,8 +52,19 @@
                     </button>
                 </div>
                 <livewire:profile.update-profile-information-form />
+                {{-- Edit Profile --}}
                 <div class="mt-6">
                     <livewire:profile.update-password-form />
+                </div>
+
+                {{-- Two Factor Authentication --}}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <livewire:profile.two-factor-authentication-form />
+                </div>
+
+                {{-- Browser Session --}}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <livewire:profile.logout-other-browser-sessions-form :sessions="session('sessions', [])" />
                 </div>
             </div>
         @endif
