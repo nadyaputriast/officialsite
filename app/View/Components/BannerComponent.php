@@ -18,7 +18,7 @@ class BannerComponent extends Component
     private function determineBanner()
     {
         $today = Carbon::now();
-        $defaultBanner = 'banner.svg';
+        $defaultBanner = 'banner.png';
 
         // Periksa hari raya nasional (prioritas tertinggi)
         $nationalHolidayBanner = $this->getNationalHolidayBanner($today);
@@ -45,13 +45,13 @@ class BannerComponent extends Component
 
         switch (true) {
             case $month == 1 && $day == 1:
-                return 'newyear-banner.svg';
+                return 'newyear-banner.png';
 
             case $month == 8 && $day == 17:
-                return 'independence-day-banner.svg'; // Hari Kemerdekaan Indonesia
+                return 'independence-day-banner.jpg'; // Hari Kemerdekaan Indonesia
 
             case $month == 4 && $day == 14:
-                return 'hut-informatika-banner.svg'; // Hut Informatika
+                return 'hut-informatika-banner.jpg'; // Hut Informatika
 
             default:
                 return null;
@@ -63,7 +63,7 @@ class BannerComponent extends Component
      */
     private function getReligiousHolidayBanner(Carbon $today)
     {
-        $defaultBanner = 'banner.svg';
+        $defaultBanner = 'banner.png';
 
         // 1. Hari Raya Islam (menggunakan library kalender Hijriah)
         try {
@@ -116,15 +116,15 @@ class BannerComponent extends Component
         switch (true) {
             // Idul Fitri (1-2 Syawal)
             case $hijriMonth == 10 && ($hijriDay == 1 || $hijriDay == 2):
-                return 'idul-fitri-banner.svg';
+                return 'idul-fitri-banner.jpg';
 
                 // Idul Adha (10 Dzulhijjah)
             case $hijriMonth == 12 && $hijriDay == 10:
-                return 'idul-adha-banner.svg';
+                return 'idul-adha-banner.png';
 
                 // 1 Muharram (Tahun Baru Hijriah)
             case $hijriMonth == 1 && $hijriDay == 1:
-                return 'islamic-new-year-banner.svg';
+                return 'islamic-new-year-banner.jpg';
 
             default:
                 return null;
@@ -149,7 +149,7 @@ class BannerComponent extends Component
 
         // Periksa apakah hari ini adalah salah satu tanggal Nyepi
         if (in_array($today->toDateString(), $nyepiDates)) {
-            return 'nyepi-banner.svg';
+            return 'nyepi-banner.jpg';
         }
 
         // Hari Raya Galungan
@@ -166,7 +166,7 @@ class BannerComponent extends Component
 
             // Periksa apakah hari ini adalah H-1, Hari H, atau H+1 dari Galungan
             if ($today->between($currentGalungan->copy()->subDay(), $currentGalungan->copy()->addDay())) {
-                return 'galungan-banner.svg';
+                return 'galungan-banner.png';
             }
         }
 
@@ -184,7 +184,7 @@ class BannerComponent extends Component
 
             // Periksa apakah hari ini adalah tanggal Siwaratri
             if ($today->isSameDay($currentSiwaratri)) {
-                return 'siwaratri-banner.svg';
+                return 'siwaratri-banner.jpg';
             }
         }
 
@@ -202,7 +202,7 @@ class BannerComponent extends Component
 
             // Periksa apakah hari ini adalah tanggal Saraswati
             if ($today->isSameDay($currentSaraswati)) {
-                return 'saraswati-banner.svg';
+                return 'saraswati-banner.jpg';
             }
         }
 
@@ -226,7 +226,7 @@ class BannerComponent extends Component
 
         // Periksa apakah hari ini adalah salah satu tanggal Waisak
         if (in_array($today->toDateString(), $waisakDates)) {
-            return 'waisak-banner.svg';
+            return 'waisak-banner.jpg';
         }
 
         return null;
@@ -250,14 +250,14 @@ class BannerComponent extends Component
 
         // Periksa apakah hari ini adalah salah satu tanggal Nyepi
         if (in_array($today->toDateString(), $imlekDates)) {
-            return 'imlek-banner.svg';
+            return 'imlek-banner.jpg';
         }
 
         // Cap Go Meh (15 hari setelah Imlek)
         foreach ($imlekDates as $imlekDate) {
             $capGoMehDate = Carbon::createFromFormat('Y-m-d', $imlekDate)->addDays(15);
             if ($today->isSameDay($capGoMehDate)) {
-                return 'cap-go-meh-banner.svg';
+                return 'cap-go-meh-banner.jpg';
             }
         }
 
@@ -268,7 +268,7 @@ class BannerComponent extends Component
     {
         // Natal (tanggal tetap)
         if ($today->month == 12 && $today->day == 25) {
-            return 'natal-banner.svg';
+            return 'natal-banner.jpg';
         }
 
         // Hitung tanggal Paskah
@@ -276,13 +276,13 @@ class BannerComponent extends Component
 
         // Paskah
         if ($today->isSameDay($easterDate)) {
-            return 'paskah-banner.svg';
+            return 'paskah-banner.jpg';
         }
 
         // Kenaikan Yesus Kristus (40 hari setelah Paskah)
         $ascensionDate = $easterDate->copy()->addDays(40);
         if ($today->isSameDay($ascensionDate)) {
-            return 'kenaikan-yesus-banner.svg';
+            return 'kenaikan-yesus-banner.jpg';
         }
 
         return null;

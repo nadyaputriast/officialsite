@@ -1,15 +1,16 @@
 {{-- Notifikasi --}}
-<div x-data="{ open: false }" class="relative max-w-7xl mx-auto mt-6 mb-4">
+<div x-data="{ open: false }" class="relative inline-block mt-6 mb-4">
+    {{-- Tombol Notifikasi --}}
     <button @click="open = !open" class="relative focus:outline-none">
         {{-- Icon Lonceng --}}
         <svg class="w-7 h-7 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
+
         {{-- Badge jumlah unread --}}
         @php
             if (auth()->user()->hasRole('admin')) {
-                // Admin: hitung data yang belum divalidasi (misal event, oprek, dst)
                 $unreadCount =
                     \App\Models\Event::where('status_event', 0)->count() +
                     \App\Models\OprekLokerProject::where('status_project', 0)->count() +
@@ -20,26 +21,28 @@
                     \App\Models\Download::where('status_download', 0)->count() +
                     \App\Models\PembayaranEvent::where('status_validasi', 0)->count();
             } else {
-                // User: hitung notifikasi yang belum dibaca
                 $unreadCount = isset($notifs) ? collect($notifs)->where('is_read', 0)->count() : 0;
             }
         @endphp
+
         @if ($unreadCount > 0)
-            <span
-                class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5">{{ $unreadCount }}</span>
+            <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5">
+                {{ $unreadCount }}
+            </span>
         @endif
     </button>
 
     {{-- Panel Notifikasi --}}
     <div x-show="open" @click.away="open = false"
-        class="absolute z-50 mt-2 w-full max-w-xl bg-white border border-gray-300 rounded shadow-lg overflow-y-auto max-h-96 transition-all">
+        class="absolute right-0 mt-2 w-80 bg-white border border-gray-300 rounded shadow-lg overflow-y-auto max-h-96 transition-all z-50">
         <div class="p-4 border-b flex justify-between items-center">
             <span class="font-semibold text-blue-700">Notifikasi</span>
             <button @click="open = false" class="text-gray-500 hover:text-gray-700 text-sm">Tutup</button>
         </div>
+
         <div class="divide-y max-h-80 overflow-y-auto">
             @if (auth()->user()->hasRole('admin'))
-                {{-- Admin: tampilkan daftar data yang belum divalidasi --}}
+                {{-- ADMIN --}}
                 @php
                     $pendingEvents = \App\Models\Event::where('status_event', 0)->get();
                     $pendingOprek = \App\Models\OprekLokerProject::where('status_project', 0)->get();
@@ -50,6 +53,7 @@
                     $pendingDownload = \App\Models\Download::where('status_download', 0)->get();
                     $pendingPembayaran = \App\Models\PembayaranEvent::where('status_validasi', 0)->get();
                 @endphp
+
                 @foreach ([$pendingEvents, $pendingOprek, $pendingPortofolio, $pendingPengabdian, $pendingPrestasi, $pendingSertifikasi, $pendingDownload, $pendingPembayaran] as $pendingList)
                     @foreach ($pendingList as $item)
                         <div class="flex justify-between items-center p-4 bg-yellow-100 text-yellow-900">
@@ -104,9 +108,8 @@
                     @endforeach
                 @endforeach
             @else
-                {{-- User: tampilkan notifikasi hasil validasi --}}
+                {{-- USER --}}
                 @php
-                    // Urutkan: unread di atas, read di bawah
                     $unreadNotifs = collect($notifs)->where('is_read', 0);
                     $readNotifs = collect($notifs)->where('is_read', 1);
                     $sortedNotifs = $unreadNotifs->concat($readNotifs);
@@ -125,11 +128,14 @@
                     <div class="flex justify-between items-center p-4 border-b">
                         <div>
                             <div class="{{ $notif->is_read ? 'text-gray-400' : '' }}">
-                                {{ $notif->isi_notifikasi }}</div>
+                                {{ $notif->isi_notifikasi }}
+                            </div>
                             <div class="text-xs mt-1">
                                 @if (isset($routeMap[$notif->notifiable_type]))
                                     <a href="{{ route($routeMap[$notif->notifiable_type], $notif->notifiable_id) }}"
-                                        class="underline">Lihat Detail</a>
+                                        class="underline">
+                                        Lihat Detail
+                                    </a>
                                 @else
                                     <span class="text-gray-400">Tidak ada detail</span>
                                 @endif
@@ -139,8 +145,8 @@
                             @if (!$notif->is_read)
                                 <form action="{{ route('notifikasi.read', $notif->id_notifikasi) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="text-xs text-blue-600 hover:underline">Tandai
-                                        sudah dibaca</button>
+                                    <button type="submit" class="text-xs text-blue-600 hover:underline">Tandai sudah
+                                        dibaca</button>
                                 </form>
                             @else
                                 <span class="text-xs text-green-600">Sudah dibaca</span>
@@ -154,4 +160,3 @@
         </div>
     </div>
 </div>
-</x-slot>

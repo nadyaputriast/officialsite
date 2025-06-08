@@ -1,7 +1,8 @@
 {{-- Informasi Download Konten --}}
+<section class="bg-[#DDF1FB]">
 <div id="download-section" class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
             <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-semibold">Informasi Download</h3>
@@ -300,3 +301,4 @@
     overflow: hidden;
 }
 </style>
+</section>
