@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+            <img src="{{ asset('images/saturuang.png') }}" alt="Logo" class="w-16 h-16 mx-auto">
         </x-slot>
 
         @if (session('status'))

@@ -204,10 +204,12 @@
             <header class="bg-white shadow-lg sticky top-0 z-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     {{-- Logo --}}
-                    <div class="flex items-center space-x-2">
+                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
                         <img src="{{ asset('images/saturuang.png') }}" alt="Logo" class="h-10 w-auto">
-                        <span class="font-bold text-black">Satu<span class="text-blue-600">Ruang</span></span>
-                    </div>
+                        <span class="font-bold text-black">
+                            Satu<span class="text-blue-600">Ruang</span>
+                        </span>
+                    </a>
 
                     <div class="hidden sm:flex sm:items-center sm:ms-6">
                         {{-- Dropdown --}}

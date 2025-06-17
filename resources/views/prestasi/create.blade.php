@@ -1,12 +1,43 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Prestasi') }}
-        </h2>
-    </x-slot>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tambah Prestasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <script src="//unpkg.com/alpinejs" defer></script>
+</head>
+
+<body>
+    {{-- Tombol Kembali --}}
+    <nav class="fixed top-0 left-0 w-full bg-white shadow-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Tombol Kembali -->
+            <a href="{{ route('dashboard') }}" class="flex items-center text-[#75AAD8] text-sm font-medium hover:underline">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Kembali ke halaman sebelumnya
+            </a>
+            <div class="flex items-center space-x-2">
+                <img src="/public/images/saturuang.png" alt="Logo" class="h-8 w-auto">
+                <span class="font-bold text-black text-[16px]">Satu<span class="text-600" style="color: #95C7EB;">Ruang</span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mt-16">
+        <x-slot name="header">
+            <header class="text-2xl font-bold text-center text-gray-800">
+                {{ __('Tambah Prestasi') }}
+            </header>
+        </x-slot>
+    </div>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <form action="{{ route('prestasi.store') }}" method="POST" enctype="multipart/form-data">
@@ -27,37 +58,37 @@
 
                         {{-- Nama Prestasi --}}
                         <div class="mb-4">
-                            <label for="nama_prestasi" class="block text-sm font-medium text-gray-700">Nama
-                                Prestasi</label>
+                            <label for="nama_prestasi" class="block text-sm font-medium text-gray-700 mb-1">Nama
+                                Prestasi<span class="text-red-500">*</span></label>
                             <input type="text" name="nama_prestasi" id="nama_prestasi"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                placeholder="Masukkan nama prestasi" class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                         </div>
 
                         {{-- Deskripsi --}}
                         <div class="mb-4">
                             <label for="deskripsi_prestasi"
-                                class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                                class="block text-sm font-medium text-gray-700">Deskripsi<span class="text-red-500">*</span></label>
                             <textarea name="deskripsi_prestasi" id="deskripsi_prestasi" rows="4"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                placeholder="Masukkan deskripsi prestasi" class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"
                                 required></textarea>
                         </div>
 
                         {{-- Tanggal Perolehan --}}
                         <div class="mb-4">
                             <label for="tanggal_perolehan" class="block text-sm font-medium text-gray-700">Tanggal
-                                Perolehan</label>
+                                Perolehan<span class="text-red-500">*</span></label>
                             <input type="date" name="tanggal_perolehan" id="tanggal_perolehan"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"                                
                                 required>
                         </div>
 
                         {{-- Tingkatan Prestasi --}}
                         <div class="mb-4">
                             <label for="tingkatan_prestasi" class="block text-sm font-medium text-gray-700">Tingkatan
-                                Prestasi</label>
+                                Prestasi<span class="text-red-500">*</span></label>
                             <select name="tingkatan_prestasi" id="tingkatan_prestasi"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                                 <option value="" disabled selected>Pilih Tingkatan Prestasi</option>
                                 <option value="Regional">Regional</option>
@@ -69,9 +100,9 @@
                         {{-- Jenis Prestasi --}}
                         <div class="mb-4">
                             <label for="jenis_prestasi" class="block text-sm font-medium text-gray-700">Jenis
-                                Prestasi</label>
+                                Prestasi<span class="text-red-500">*</span></label>
                             <select name="jenis_prestasi" id="jenis_prestasi"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                                 <option value="" disabled selected>Pilih Jenis Prestasi</option>
                                 <option value="Akademik">Akademik</option>
@@ -82,14 +113,14 @@
                         {{-- Dokumentasi Prestasi --}}
                         <div class="mb-4">
                             <label for="dokumentasi_prestasi"
-                                class="block text-sm font-medium text-gray-700">Dokumentasi Prestasi</label>
+                                class="block text-sm font-medium text-gray-700">Dokumentasi Prestasi<span class="text-red-500">*</span></label>
                             <div id="gambar-container">
                                 <div class="flex items-center mb-2">
                                     <input type="file" name="dokumentasi_prestasi[]" id="dokumentasi_prestasi"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"
                                         required>
                                     <button type="button"
-                                        class="ml-2 px-3 py-1 bg-green-500 text-black rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                                        class="ml-2 px-3 py-1 bg-[#75AAD8] text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
                                         onclick="addDokumentasi()">Add</button>
                                 </div>
                             </div>
@@ -101,18 +132,13 @@
                         {{-- Tag Pengguna --}}
                         <div class="form-group mb-4">
                             <label for="user_tags" class="block text-sm font-medium text-gray-700">Tag Pengguna</label>
-                            <p class="text-xs text-gray-500 mb-1">Tag pengguna lain(pisahkan dengan koma), misal @nama1
-                            </p>
                             <input type="text" name="user_tags" id="user_tags"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                placeholder="Tag pengguna lain(pisahkan dengan koma), misal @nama1" class="w-full border rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
                         <button type="submit"
-                            class="px-4 py-2 bg-blue-500 text-black rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan</button>
-
-                        {{-- Tombol Kembali --}}
-                        <a href="{{ route('dashboard') }}"
-                            class="px-4 py-2 text-black hover:text-blue-700 rounded">Kembali</a>
+                            class="w-full bg-[#75AAD8] hover:bg-[#5a93c7] text-white rounded-lg py-3 font-semibold">Kirim Proyek untuk Divalidasi
+                        </button>
                     </form>
                 </div>
             </div>
@@ -173,4 +199,4 @@
             row.remove();
         }
     </script>
-</x-app-layout>
+</body>

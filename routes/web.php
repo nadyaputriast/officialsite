@@ -128,6 +128,7 @@ Route::middleware(['auth'])->prefix('prestasi')->name('prestasi.')->group(functi
     Route::get('/{id}', [PrestasiController::class, 'show'])->name('show');
     Route::get('/{id}/edit', [PrestasiController::class, 'edit'])->name('edit');
     Route::put('/{id}', [PrestasiController::class, 'update'])->name('update');
+    Route::delete('/{id}', [PrestasiController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/komentar', [PrestasiController::class, 'komentar'])->name('komentar');
 });
 
@@ -184,7 +185,21 @@ Route::prefix('event')->name('event.')->group(function () {
     });
 });
 
-// Route::get('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->middleware('auth');
+Route::middleware(['auth'])->prefix('pembayaran')->name('pembayaran.')->group(function () {
+    Route::get('/', [PembayaranEventInternalController::class, 'index'])->name('index');
+    Route::get('/create/{registration_id}', [PembayaranEventInternalController::class, 'create'])->name('create');
+    Route::post('/', [PembayaranEventInternalController::class, 'store'])->name('store');
+    Route::get('/{id}', [PembayaranEventInternalController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [PembayaranEventInternalController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [PembayaranEventInternalController::class, 'update'])->name('update');
+    Route::delete('/{id}', [PembayaranEventInternalController::class, 'destroy'])->name('destroy');
+    
+    // Route admin untuk validasi pembayaran
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/{id}/validasi', [PembayaranEventInternalController::class, 'validasi'])->name('validasi');
+        Route::post('/{id}/tolak', [PembayaranEventInternalController::class, 'tolak'])->name('tolak');
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -195,7 +210,6 @@ Route::prefix('event')->name('event.')->group(function () {
 Route::prefix('download')->name('download.')->group(function () {
     Route::get('/', [DownloadController::class, 'index'])->name('index');
     Route::get('/file/{id}', [DownloadController::class, 'downloadFile'])->name('file');
-    Route::get('/{id}', [DownloadController::class, 'show'])->name('show'); // ← Tambahkan ini
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/create', [DownloadController::class, 'create'])->name('create');
@@ -204,6 +218,8 @@ Route::prefix('download')->name('download.')->group(function () {
         Route::put('/update/{id}', [DownloadController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [DownloadController::class, 'destroy'])->name('destroy');
     });
+
+    Route::get('/{id}', [DownloadController::class, 'show'])->name('show');
 });
 
 /*
@@ -246,7 +262,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/sertifikasi/{id}/validate', [SertifikasiController::class, 'validateSertifikasi'])->name('sertifikasi.validate');
     Route::post('/event/{id_event}/validate', [EventController::class, 'validateEvent'])->name('event.validate');
     Route::post('/download/{id}/validate', [DownloadController::class, 'validateDownload'])->name('download.validate');
-    Route::post('/pembayaran/{id}/validasi', [PembayaranEventInternalController::class, 'validasi'])->name('pembayaran.validasi');
     Route::post('/user/{id}/validate', [UserController::class, 'validateUser'])->name('user.validate');
 });
 

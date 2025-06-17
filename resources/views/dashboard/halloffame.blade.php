@@ -134,40 +134,45 @@
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            @if ($topPrestasi)
-                <div
-                    class="bg-white rounded-xl p-6 shadow-md border border-green-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div class="text-center">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-4 shadow-lg">
-                            🏆
+            @if ($topPrestasi && count($topPrestasi) > 0)
+                @foreach ($topPrestasi as $prestasi)
+                    <div
+                        class="bg-white rounded-xl shadow-md p-6 border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                        <div class="mb-2">
+                            <span
+                                class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                            @if ($prestasi['tingkatan_prestasi'] == 'Internasional') bg-yellow-500
+                            @elseif($prestasi['tingkatan_prestasi'] == 'Nasional') bg-blue-500
+                            @else bg-green-500 @endif
+                            text-white">
+                                {{ $prestasi['tingkatan_prestasi'] }}
+                            </span>
                         </div>
-                        <a href="{{ route('prestasi.show', $topPrestasi->id_prestasi) }}"
-                            class="text-green-700 hover:text-green-900 font-semibold hover:underline block mb-3 line-clamp-2 text-lg">
-                            {{ $topPrestasi->nama_prestasi }}
-                        </a>
-                        <div class="text-gray-600 mb-4">
-                            by <span class="font-medium">{{ $topPrestasi->owner->nama_pengguna ?? 'Unknown' }}</span>
-                        </div>
-                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
-                            <div class="text-lg font-medium text-green-700 mb-1">
-                                {{ $topPrestasi->tingkatan_prestasi ?? 'Internasional' }}
+                        <h3 class="font-semibold text-lg mb-2">{{ $prestasi['nama_prestasi'] }}</h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            {{ Str::limit($prestasi['deskripsi_prestasi'], 100) }}
+                        </p>
+                        @if (isset($prestasi['owner']) && $prestasi['owner'])
+                            <div class="flex items-center text-sm text-gray-500 mb-2">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                        clip-rule="evenodd">
+                                    </path>
+                                </svg>
+                                {{ $prestasi['owner']['nama_pengguna'] }}
                             </div>
-                            <div class="text-sm text-gray-500">
-                                {{ $topPrestasi->tanggal_perolehan ? date('M Y', strtotime($topPrestasi->tanggal_perolehan)) : '' }}
-                            </div>
+                        @endif
+                        <div class="text-xs text-gray-400 mt-auto">
+                            {{ \Carbon\Carbon::parse($prestasi['created_at'])->format('d M Y') }}
                         </div>
                     </div>
+                @endforeach
+            @else
+                <div class="col-span-1 md:col-span-3 text-center text-gray-500 py-8">
+                    <p>Belum ada prestasi bulan ini</p>
                 </div>
             @endif
-            @for ($i = $topPrestasi ? 1 : 0; $i < 3; $i++)
-                <div
-                    class="bg-gray-50 rounded-xl p-6 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 min-h-[280px]">
-                    <div class="text-6xl mb-4">-</div>
-                    <div class="text-lg font-medium">Slot {{ $i + 1 }}</div>
-                    <div class="text-sm">Belum tersedia</div>
-                </div>
-            @endfor
         </div>
     </div>
+</div>
 </div>

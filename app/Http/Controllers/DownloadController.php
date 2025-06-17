@@ -30,15 +30,14 @@ class DownloadController extends Controller
 
     public function store(Request $request)
     {
-        // First, check if the user is authenticated
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
         $request->validate([
             'nama_download' => 'required|string|max:255',
-            'jenis_konten' => 'required|string|in:Materi Kuliah, Aplikasi, Manual Book, Source Code, Template, Dataset,E-book',
-            'file_konten' => 'required|file|mimes:pdf,docx,zip,sql,json,csv,exe,pptx|max:20480',
+            'jenis_konten' => 'required|string|in:Materi Kuliah,Aplikasi,Manual Book,Source Code,Template,Dataset,E-book',
+            'file_konten' => 'required|file|mimes:pdf,docx,zip,sql,json,csv,exe,pptx,txt,py,c,cpp,js,php,html,css,java,xml|max:20480',
         ]);
 
         $user = Auth::user();
@@ -46,10 +45,8 @@ class DownloadController extends Controller
         DB::beginTransaction();
 
         try {
-            // Simpan file terlebih dahulu
             $path = $request->file('file_konten')->store('file_konten', 'public');
 
-            // Setelah file disimpan, baru buat record
             $download = new Download();
             $download->nama_download = $request->nama_download;
             $download->jenis_konten = $request->jenis_konten;
@@ -76,8 +73,8 @@ class DownloadController extends Controller
 
         $request->validate([
             'nama_download' => 'required|string|max:255',
-            'jenis_konten' => 'required|string|in:Materi Kuliah, Aplikasi, Manual Book, Source Code, Template, Dataset,E-book',
-            'file_konten' => 'required|file|mimes:pdf,docx,zip,sql,json,csv,exe,pptx|max:20480',
+            'jenis_konten' => 'required|string|in:Materi Kuliah,Aplikasi,Manual Book,Source Code,Template,Dataset,E-book',
+            'file_konten' => 'nullable|file|mimes:pdf,docx,zip,sql,json,csv,exe,pptx,txt,py,c,cpp,js,php,html,css,java,xml|max:20480',
         ]);
 
         DB::beginTransaction();
@@ -86,18 +83,16 @@ class DownloadController extends Controller
             $download->nama_download = $request->nama_download;
             $download->jenis_konten = $request->jenis_konten;
 
-            // Menyimpan dokumen jika ada// Ganti dokumen jika ada dokumen baru
             if ($request->hasFile('file_konten')) {
-                // Hapus dokumen lama jika ada
                 if ($download->file_konten && Storage::exists('public/' . $download->file_konten)) {
                     Storage::delete('public/' . $download->file_konten);
                 }
-
-                // Simpan dokumen baru
                 $path = $request->file('file_konten')->store('file_konten', 'public');
                 $download->file_konten = $path;
             }
             $download->save();
+            DB::commit();
+            return redirect()->route('dashboard')->with('success', 'Download berhasil diupdate.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

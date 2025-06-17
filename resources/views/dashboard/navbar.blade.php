@@ -1,10 +1,12 @@
 <header class="bg-white shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {{-- Logo --}}
-        <div class="flex items-center space-x-2">
+        <a href="#" class="flex items-center space-x-2">
             <img src="{{ asset('images/saturuang.png') }}" alt="Logo" class="h-10 w-auto">
-            <span class="font-bold text-black">Satu<span class="text-blue-600">Ruang</span></span>
-        </div>
+            <span class="font-bold text-black">
+                Satu<span class="text-blue-600">Ruang</span>
+            </span>
+        </a>
 
         {{-- Navigation Links --}}
         <div class="flex-1 flex justify-center space-x-4">
@@ -83,7 +85,7 @@
             @else
                 {{-- Jika belum login --}}
                 <a href="{{ route('register') }}"
-                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
+                    class="rounded-md px-4 py-2 bg-blue-600 text-white hover:bg-blue-500 transition">
                     Register
                 </a>
                 <a href="{{ route('login') }}"

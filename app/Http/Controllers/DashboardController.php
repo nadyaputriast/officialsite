@@ -83,9 +83,8 @@ class DashboardController extends Controller
             $topPortofolio = $this->getTopPortofolio($prev->month, $prev->year);
         }
 
-        // Top Prestasi
         $topPrestasi = $this->getTopPrestasi($month, $year);
-        if (!$topPrestasi) {
+        if ($topPrestasi->isEmpty()) {
             $prev = $now->copy()->subMonth();
             $topPrestasi = $this->getTopPrestasi($prev->month, $prev->year);
         }
@@ -365,22 +364,51 @@ class DashboardController extends Controller
     private function getTopPrestasi($month, $year)
     {
         $tingkatanPrioritas = ['Internasional', 'Nasional', 'Regional'];
+        $prestasiList = [];
+        $maxSlots = 3;
 
+        // Ambil prestasi berdasarkan prioritas tingkatan
         foreach ($tingkatanPrioritas as $tingkatan) {
+            if (count($prestasiList) >= $maxSlots) {
+                break; // Sudah cukup 3 slot
+            }
+
+            $remainingSlots = $maxSlots - count($prestasiList);
+
             $prestasi = Prestasi::where('status_prestasi', 1)
                 ->where('tingkatan_prestasi', $tingkatan)
                 ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
                 ->with('owner')
                 ->latest()
-                ->first();
+                ->take($remainingSlots) // Ambil sebanyak slot yang tersisa
+                ->get();
 
-            if ($prestasi) {
-                return $prestasi;
+            if ($prestasi->isNotEmpty()) {
+                $prestasiList = array_merge($prestasiList, $prestasi->toArray());
             }
         }
 
-        return null;
+        // Jika masih kurang dari 3, ambil prestasi tambahan dari bulan sebelumnya
+        if (count($prestasiList) < $maxSlots) {
+            $existingIds = collect($prestasiList)->pluck('id_prestasi')->toArray();
+            $remainingSlots = $maxSlots - count($prestasiList);
+
+            $additionalPrestasi = Prestasi::where('status_prestasi', 1)
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->whereNotIn('id_prestasi', $existingIds)
+                ->with('owner')
+                ->latest()
+                ->take($remainingSlots)
+                ->get();
+
+            if ($additionalPrestasi->isNotEmpty()) {
+                $prestasiList = array_merge($prestasiList, $additionalPrestasi->toArray());
+            }
+        }
+
+        return collect($prestasiList);
     }
 
     private function getPaginatedEventPayments()

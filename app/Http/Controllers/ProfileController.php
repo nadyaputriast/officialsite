@@ -44,6 +44,6 @@ class ProfileController extends Controller
 
 		$sertifikasi = Sertifikasi::where('id_pengguna', $user->id_pengguna)->get();
 
-		return view('profile', compact('user', 'pengabdian', 'prestasi', 'portofolio', 'sertifikasi'));
+		return view('profile.show', compact('user', 'pengabdian', 'prestasi', 'portofolio', 'sertifikasi'));
 	}
 }

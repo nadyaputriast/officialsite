@@ -8,6 +8,7 @@ use App\Models\OprekLokerProject;
 use App\Models\Portofolio;
 use App\Models\Prestasi;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class WelcomeController extends Controller
 {
@@ -17,7 +18,7 @@ class WelcomeController extends Controller
         $eventQuery = Event::with('owner')
             ->where('status_event', 1) // Perbaiki kolom status
             ->orderByDesc('created_at');
-        
+
         if ($request->filled('search_event')) {
             $eventQuery->where('nama_event', 'like', '%' . $request->search_event . '%');
         }
@@ -27,7 +28,7 @@ class WelcomeController extends Controller
         $portofolioQuery = Portofolio::with(['owner', 'kategori', 'gambar'])
             ->where('status_portofolio', 1) // Perbaiki kolom status
             ->orderByDesc('created_at');
-        
+
         if ($request->filled('search_portofolio')) {
             $portofolioQuery->where('nama_portofolio', 'like', '%' . $request->search_portofolio . '%');
         }
@@ -41,13 +42,13 @@ class WelcomeController extends Controller
         // Search/filter Oprek - untuk welcome page gunakan get()
         $oprekQuery = OprekLokerProject::with(['owner'])
             ->orderByDesc('created_at');
-        
+
         // Filter hanya yang masih aktif (deadline belum lewat)
         $oprekQuery->where(function ($q) {
             $q->whereNull('deadline_project')
-              ->orWhere('deadline_project', '>=', now());
+                ->orWhere('deadline_project', '>=', now());
         });
-        
+
         if ($request->filled('search_oprek')) {
             $oprekQuery->where('nama_project', 'like', '%' . $request->search_oprek . '%');
         }
@@ -59,7 +60,7 @@ class WelcomeController extends Controller
         // Search/filter Download - untuk welcome page gunakan get()
         $downloadQuery = Download::with('pengguna')
             ->orderByDesc('created_at');
-        
+
         if ($request->filled('search_download')) {
             $downloadQuery->where('nama_download', 'like', '%' . $request->search_download . '%');
         }
@@ -73,11 +74,24 @@ class WelcomeController extends Controller
             ->get();
 
         // Top Prestasi (by tingkat dan tanggal) - hanya yang disetujui
-        $topPrestasi = Prestasi::with('owner')
-            ->where('status_prestasi', 1) // Perbaiki kolom status
-            ->orderByRaw("FIELD(tingkatan_prestasi, 'Internasional', 'Nasional', 'Provinsi', 'Kabupaten', 'Lokal')")
-            ->orderByDesc('tanggal_perolehan')
-            ->first();
+        $now = Carbon::now();
+        $month = $now->month;
+        $year = $now->year;
+
+        // Gunakan method dari DashboardController
+        $dashboardController = new DashboardController();
+
+        // Akses method private menggunakan reflection
+        $reflection = new \ReflectionClass($dashboardController);
+
+        $getTopPrestasi = $reflection->getMethod('getTopPrestasi');
+        $getTopPrestasi->setAccessible(true);
+        $topPrestasi = $getTopPrestasi->invoke($dashboardController, $month, $year);
+
+        if ($topPrestasi->isEmpty()) {
+            $prev = $now->copy()->subMonth();
+            $topPrestasi = $getTopPrestasi->invoke($dashboardController, $prev->month, $prev->year);
+        }
 
         // Kategori stats - hitung hanya portofolio yang disetujui
         $kategoriList = [
