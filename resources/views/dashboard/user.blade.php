@@ -45,6 +45,7 @@
                                             <th class="border border-gray-300 px-4 py-2">Alamat</th>
                                             <th class="border border-gray-300 px-4 py-2">Tanggal Lahir</th>
                                             <th class="border border-gray-300 px-4 py-2">Role</th>
+                                            <th class="border border-gray-300 px-4 py-2">File Terkait</th>
                                             <th class="border border-gray-300 px-4 py-2">Status</th>
                                             <th class="border border-gray-300 px-4 py-2">Aksi</th>
                                         </tr>
@@ -72,6 +73,16 @@
                                                     {{ $user->tanggal_lahir ?? '-' }}</td>
                                                 <td class="border border-gray-300 px-4 py-2">
                                                     {{ ucfirst($user->getRoleNames()->first() ?? '-') }}
+                                                </td>
+                                                <td class="border border-gray-300 px-4 py-2">
+                                                    @if ($user->hasRole('mahasiswa') && $user->mahasiswa && $user->mahasiswa->ktm)
+                                                        <a href="{{ asset('storage/' . $user->mahasiswa->ktm) }}"
+                                                            class="text-blue-500 hover:underline" target="_blank">
+                                                            Lihat KTM
+                                                        </a>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                                 <td class="border border-gray-300 px-4 py-2">
                                                     @if ($user->status_validasi == 1)
