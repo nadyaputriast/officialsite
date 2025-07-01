@@ -68,13 +68,17 @@ Route::post('/dashboard/user/validasi/{user}', [DashboardController::class, 'val
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'ownProfile'])->name('profile');
     Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.user');
+    Route::post('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->name('cek.promo');
+    Route::get('/registration-status/{id}', [EventRegistrationController::class, 'checkRegistrationStatus'])->name('registration.status');
+    Route::get('/my-payment-status/{registrationId}', [EventRegistrationController::class, 'checkMyPaymentStatus'])->name('payment.status');
+    Route::get('/payment-waiting/{registrationId}', [EventRegistrationController::class, 'waitingValidation'])->name('payment.waiting');
 });
 
-Route::put('/profile', [App\Http\Controllers\UserController::class, 'update'])
+Route::put('/profile', [UserController::class, 'update'])
     ->name('profile.update')
     ->middleware('auth');
 
-Route::put('/password', [App\Http\Controllers\UserController::class, 'updatePassword'])
+Route::put('/password', [UserController::class, 'updatePassword'])
     ->name('password.update')
     ->middleware('auth');
 
@@ -105,7 +109,7 @@ Route::middleware(['auth'])->prefix('portofolio')->name('portofolio.')->group(fu
 
 Route::prefix('oprek')->name('oprek.')->group(function () {
     Route::get('/', [OprekProjectController::class, 'index'])->name('index');
-    
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/show/{id}', [OprekProjectController::class, 'show'])->name('show');
         Route::get('/create', [OprekProjectController::class, 'create'])->name('create');
@@ -113,6 +117,7 @@ Route::prefix('oprek')->name('oprek.')->group(function () {
         Route::get('/edit/{id}', [OprekProjectController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [OprekProjectController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [OprekProjectController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/komentar', [OprekProjectController::class, 'komentar'])->name('komentar');
     });
 });
 
@@ -144,6 +149,7 @@ Route::middleware(['auth'])->prefix('pengabdian')->name('pengabdian.')->group(fu
     Route::get('/{id}', [PengabdianController::class, 'show'])->name('show');
     Route::get('/{id}/edit', [PengabdianController::class, 'edit'])->name('edit');
     Route::put('/{id}', [PengabdianController::class, 'update'])->name('update');
+    Route::delete('/{id}', [PengabdianController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/komentar', [PengabdianController::class, 'komentar'])->name('komentar');
 });
 
@@ -159,6 +165,7 @@ Route::middleware(['auth'])->prefix('sertifikasi')->name('sertifikasi.')->group(
     Route::get('/{id}', [SertifikasiController::class, 'show'])->name('show');
     Route::get('/{id}/edit', [SertifikasiController::class, 'edit'])->name('edit');
     Route::put('/{id}', [SertifikasiController::class, 'update'])->name('update');
+    Route::delete('/{id}', [SertifikasiController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/komentar', [SertifikasiController::class, 'komentar'])->name('komentar');
 });
 
@@ -179,9 +186,9 @@ Route::prefix('event')->name('event.')->group(function () {
         Route::get('/edit/{id}', [EventController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [EventController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/komentar', [EventController::class, 'komentar'])->name('komentar');
         Route::get('/register/{id}', [EventRegistrationController::class, 'register'])->name('register');
         Route::post('/register/{id}', [EventRegistrationController::class, 'store'])->name('register.store');
-        Route::post('/cek-promo', [EventRegistrationController::class, 'cekPromo'])->name('cek.promo');
     });
 });
 
@@ -193,7 +200,7 @@ Route::middleware(['auth'])->prefix('pembayaran')->name('pembayaran.')->group(fu
     Route::get('/{id}/edit', [PembayaranEventInternalController::class, 'edit'])->name('edit');
     Route::put('/{id}', [PembayaranEventInternalController::class, 'update'])->name('update');
     Route::delete('/{id}', [PembayaranEventInternalController::class, 'destroy'])->name('destroy');
-    
+
     // Route admin untuk validasi pembayaran
     Route::middleware(['role:admin'])->group(function () {
         Route::post('/{id}/validasi', [PembayaranEventInternalController::class, 'validasi'])->name('validasi');
@@ -209,7 +216,7 @@ Route::middleware(['auth'])->prefix('pembayaran')->name('pembayaran.')->group(fu
 
 Route::prefix('download')->name('download.')->group(function () {
     Route::get('/', [DownloadController::class, 'index'])->name('index');
-    Route::get('/file/{id}', [DownloadController::class, 'downloadFile'])->name('file');
+    Route::get('/file/{id}', [DownloadController::class, 'download'])->name('file');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/create', [DownloadController::class, 'create'])->name('create');
@@ -217,6 +224,7 @@ Route::prefix('download')->name('download.')->group(function () {
         Route::get('/edit/{id}', [DownloadController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [DownloadController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [DownloadController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/komentar', [DownloadController::class, 'komentar'])->name('komentar');
     });
 
     Route::get('/{id}', [DownloadController::class, 'show'])->name('show');
@@ -265,4 +273,4 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/user/{id}/validate', [UserController::class, 'validateUser'])->name('user.validate');
 });
 
-require __DIR__ . '/auth.php';    
+require __DIR__ . '/auth.php';

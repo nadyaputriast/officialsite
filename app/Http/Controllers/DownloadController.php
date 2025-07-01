@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Download;
+use App\Models\Notifikasi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -164,5 +165,25 @@ class DownloadController extends Controller
             \Log::error('Gagal memvalidasi download: ' . $e->getMessage());
             return back()->with('error', 'Gagal memvalidasi download.');
         }
+    }
+
+    public function komentar(Request $request, $id)
+    {
+        $request->validate([
+            'isi_notifikasi' => 'required|string|max:255',
+        ]);
+
+        $download = Download::findOrFail($id);
+
+        // Simpan komentar sebagai notifikasi ke user download
+        Notifikasi::create([
+            'isi_notifikasi' => $request->isi_notifikasi,
+            'notifiable_id' => $download->id_download,
+            'notifiable_type' => 'download',
+            'id_pengguna' => $download->id_pengguna,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 }

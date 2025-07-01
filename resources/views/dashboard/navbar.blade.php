@@ -13,7 +13,7 @@
             <a href="#" class="text-black hover:text-blue-600">Home</a>
             @auth
                 @if (auth()->user()->hasRole('admin'))
-                    <a href="#pembayaran-section" class="text-black hover:text-blue-600">Pembayaran Event</a>
+                    {{-- <a href="#pembayaran-section" class="text-black hover:text-blue-600">Pembayaran Event</a>
                     <a href="#user-section" class="text-black hover:text-blue-600">User</a>
                     <a href="#event-section" class="text-black hover:text-blue-600">Event</a>
                     <a href="#oprek-section" class="text-black hover:text-blue-600">Hiring</a>
@@ -21,7 +21,7 @@
                     <a href="#pengabdian-section" class="text-black hover:text-blue-600">Pengabdian</a>
                     <a href="#prestasi-section" class="text-black hover:text-blue-600">Prestasi</a>
                     <a href="#sertifikasi-section" class="text-black hover:text-blue-600">Sertifikasi</a>
-                    <a href="#download-section" class="text-black hover:text-blue-600">Download</a>
+                    <a href="#download-section" class="text-black hover:text-blue-600">Download</a> --}}
                 @else
                     <a href="#portofolio-section" class="text-black hover:text-blue-600">Project</a>
                     <a href="#event-section" class="text-black hover:text-blue-600">Event</a>

@@ -50,4 +50,9 @@ class Event extends Model
     {
         return $this->hasMany(EventRegistration::class, 'id_event', 'id_event');
     }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notifikasi::class, 'notifiable');
+    }
 }

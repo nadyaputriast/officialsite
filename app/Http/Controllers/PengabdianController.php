@@ -100,6 +100,7 @@ class PengabdianController extends Controller
     {
         $pengabdian = Pengabdian::findOrFail($id);
 
+        // Check authorization
         if ($pengabdian->id_pengguna !== auth()->id()) {
             abort(403, 'Anda tidak memiliki izin untuk mengedit pengabdian ini.');
         }
@@ -109,7 +110,7 @@ class PengabdianController extends Controller
             'deskripsi_pengabdian' => 'required|string',
             'tanggal_pengabdian' => 'required|date',
             'pelaksana' => 'required|string|max:255',
-            'dokumentasi_pengabdian' => 'required|array',
+            'dokumentasi_pengabdian' => 'sometimes|array',
             'dokumentasi_pengabdian.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'user_tags' => 'nullable|string',
         ]);
@@ -122,14 +123,16 @@ class PengabdianController extends Controller
             $pengabdian->tanggal_pengabdian = $request->tanggal_pengabdian;
             $pengabdian->pelaksana = $request->pelaksana;
 
+            $pengabdian->save();
+
             if ($request->hasFile('dokumentasi_pengabdian')) {
-                // Hapus gambar lama dari storage dan database
                 foreach ($pengabdian->dokumentasi as $dokumentasi) {
-                    Storage::delete($dokumentasi->dokumentasi_pengabdian);
+                    if (Storage::disk('public')->exists($dokumentasi->dokumentasi_pengabdian)) {
+                        Storage::disk('public')->delete($dokumentasi->dokumentasi_pengabdian);
+                    }
                     $dokumentasi->delete();
                 }
 
-                // Simpan dokumentasi baru
                 foreach ($request->file('dokumentasi_pengabdian') as $image) {
                     $path = $image->store('pengabdian', 'public');
                     DokumentasiPengabdian::create([
@@ -139,24 +142,31 @@ class PengabdianController extends Controller
                 }
             }
 
-            // Update tag pengguna
             if (!empty($request->user_tags)) {
-                $tags = collect(explode(',', $request->user_tags))->map(function ($tag) {
-                    return trim(ltrim($tag, '@'));
-                });
+                $tags = collect(explode(',', $request->user_tags))
+                    ->map(function ($tag) {
+                        return trim(ltrim($tag, '@'));
+                    })
+                    ->filter(); 
 
-                // Ambil pengguna yang ditag sebelumnya
-                $taggedUsersLama = $pengabdian->taggedUsers->pluck('nama_pengguna');
+                $currentTaggedUsers = $pengabdian->taggedUsers->pluck('nama_pengguna');
 
-                // Hapus tag lama yang tidak ada dalam input baru
-                $tagsUntukDihapus = $taggedUsersLama->diff($tags);
-                $usersUntukDihapus = User::whereIn('nama_pengguna', $tagsUntukDihapus)->pluck('id_pengguna');
-                $pengabdian->taggedUsers()->detach($usersUntukDihapus);
+                // Find users to remove
+                $tagsToRemove = $currentTaggedUsers->diff($tags);
+                if ($tagsToRemove->isNotEmpty()) {
+                    $usersToRemove = User::whereIn('nama_pengguna', $tagsToRemove)->pluck('id_pengguna');
+                    $pengabdian->taggedUsers()->detach($usersToRemove);
+                }
 
-                // Tambahkan tag baru yang belum ada
-                $tagsUntukDitambahkan = $tags->diff($taggedUsersLama);
-                $usersUntukDitambahkan = User::whereIn('nama_pengguna', $tagsUntukDitambahkan)->pluck('id_pengguna');
-                $pengabdian->taggedUsers()->attach($usersUntukDitambahkan);
+                // Find users to add
+                $tagsToAdd = $tags->diff($currentTaggedUsers);
+                if ($tagsToAdd->isNotEmpty()) {
+                    $usersToAdd = User::whereIn('nama_pengguna', $tagsToAdd)->pluck('id_pengguna');
+                    $pengabdian->taggedUsers()->attach($usersToAdd);
+                }
+            } else {
+                // If no tags provided, remove all tags
+                $pengabdian->taggedUsers()->detach();
             }
 
             DB::commit();
@@ -164,7 +174,8 @@ class PengabdianController extends Controller
             return redirect()->route('pengabdian.show', $id)->with('success', 'Pengabdian berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            \Log::error('Gagal update pengabdian: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -172,20 +183,30 @@ class PengabdianController extends Controller
     {
         $pengabdian = Pengabdian::findOrFail($id);
 
+        // Check authorization (admin or owner)
+        if (!auth()->user()->hasRole('admin') && $pengabdian->id_pengguna !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki izin untuk menghapus pengabdian ini.');
+        }
+
         DB::beginTransaction();
 
         try {
-            DokumentasiPengabdian::where('id_pengabdian', $id)->each(function ($dokumentasi) {
-                if (Storage::exists($dokumentasi->dokumentasi_pengabdian)) {
-                    Storage::delete($dokumentasi->dokumentasi_pengabdian);
+            // Delete documentation files and records
+            foreach ($pengabdian->dokumentasi as $dokumentasi) {
+                if (Storage::disk('public')->exists($dokumentasi->dokumentasi_pengabdian)) {
+                    Storage::disk('public')->delete($dokumentasi->dokumentasi_pengabdian);
                 }
                 $dokumentasi->delete();
-            });
-            // Hapus tagged users
+            }
+
             $pengabdian->taggedUsers()->detach();
 
-            // Hapus semua tagged users kecuali pemilik pengabdian
-            $pengabdian->taggedUsers()->sync([], false);
+            // Delete related notifications
+            Notifikasi::where('notifiable_id', $id)
+                ->where('notifiable_type', 'pengabdian')
+                ->delete();
+
+            // Delete the pengabdian
             $pengabdian->delete();
 
             DB::commit();
@@ -193,7 +214,7 @@ class PengabdianController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Gagal menghapus pengabdian: ' . $e->getMessage());
-            return back()->with('error', 'Gagal menghapus pengabdian.');
+            return back()->with('error', 'Gagal menghapus pengabdian: ' . $e->getMessage());
         }
     }
 

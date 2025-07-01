@@ -56,16 +56,6 @@
                 <div class="mt-6">
                     <livewire:profile.update-password-form />
                 </div>
-
-                {{-- Two Factor Authentication --}}
-                <div class="bg-white shadow rounded-lg p-6">
-                    <livewire:profile.two-factor-authentication-form />
-                </div>
-
-                {{-- Browser Session --}}
-                <div class="bg-white shadow rounded-lg p-6">
-                    <livewire:profile.logout-other-browser-sessions-form :sessions="session('sessions', [])" />
-                </div>
             </div>
         @endif
 
@@ -200,6 +190,7 @@
                     <button class="tab-btn active" onclick="showTab('pengabdian')">Pengabdian</button>
                     <button class="tab-btn" onclick="showTab('prestasi')">Prestasi</button>
                     <button class="tab-btn" onclick="showTab('sertifikasi')">Sertifikasi</button>
+                    <button class="tab-btn" onclick="showTab('portofolio')">Portofolio</button>
                 </div>
                 {{-- Pengabdian --}}
                 <div id="tab-pengabdian" class="tab-content">
@@ -309,6 +300,44 @@
                                 {{-- Hanya pemilik yang bisa hapus --}}
                                 @if ($item->id_pengguna == auth()->id())
                                     <form action="{{ route('sertifikasi.destroy', $item->id_sertifikasi) }}"
+                                        method="POST" onsubmit="return confirm('Yakin hapus?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit"
+                                            class="text-red-600 hover:underline text-sm">Hapus</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div id="tab-portofolio" class="tab-content hidden">
+                    @if ($isOwner)
+                        <a href="{{ route('portofolio.create') }}"
+                            class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm transition">+
+                            Tambah portofolio</a>
+                    @endif
+                    @foreach ($portofolio as $item)
+                        {{-- Tampilkan semua data yang sudah difilter di controller --}}
+                        <div class="mb-4 p-4 border rounded flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">{{ $item->nama_portofolio }}</div>
+                                <div class="text-gray-500 text-sm">
+                                    {{ $item->deskripsi_portofolio ?? 'Tidak ada deskripsi' }}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                {{-- Hanya pemilik yang bisa edit --}}
+                                @if ($item->id_pengguna == auth()->id())
+                                    <a href="{{ route('portofolio.edit', $item->id_portofolio) }}"
+                                        class="text-blue-600 hover:underline text-sm">Edit</a>
+                                @else
+                                    {{-- Yang bukan pemilik hanya bisa lihat --}}
+                                    <a href="{{ route('portofolio.show', $item->id_portofolio) }}"
+                                        class="text-blue-600 hover:underline text-sm">Lihat</a>
+                                @endif
+                                {{-- Hanya pemilik yang bisa hapus --}}
+                                @if ($item->id_pengguna == auth()->id())
+                                    <form action="{{ route('portofolio.destroy', $item->id_portofolio) }}"
                                         method="POST" onsubmit="return confirm('Yakin hapus?')">
                                         @csrf @method('DELETE')
                                         <button type="submit"

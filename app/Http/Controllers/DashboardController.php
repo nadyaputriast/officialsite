@@ -22,10 +22,10 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $isAdmin = $user->hasRole('admin');
+        $isAdmin = $user && $user->hasRole('admin');
 
         // Get base data berdasarkan role
-        $baseData = $this->getBaseData($isAdmin);
+        $baseData = $this->getBaseData($isAdmin, $request);
 
         // Get additional data
         $additionalData = $this->getAdditionalData();
@@ -33,14 +33,45 @@ class DashboardController extends Controller
         // Apply filters to main sections
         $filteredData = $this->applyFilters($request, $isAdmin);
 
-        $paginatedEvents = $isAdmin ? $this->getPaginatedEventPayments() : null;
+        // Get paginated events with request for filtering
+        $paginatedEvents = $isAdmin ? $this->getPaginatedEventPayments($request) : null;
 
-        $users = $isAdmin ? User::with('roles')->orderBy('nama_pengguna')->paginate(15) : null;
+        // Get users with filtering and search
+        $users = collect([]);
+        if ($isAdmin) {
+            $usersQuery = User::with('roles')->orderBy('nama_pengguna');
 
-        return view('dashboard', array_merge($baseData, $additionalData, $filteredData, [
-            'paginatedEvents' => $paginatedEvents,
-            'users' => $users,
-        ]));
+            // Apply search filter
+            if ($request->filled('search_user')) {
+                $usersQuery->where('nama_pengguna', 'like', '%' . $request->search_user . '%');
+            }
+
+            // Apply status validasi filter
+            if ($request->filled('status_validasi')) {
+                $usersQuery->where('status_validasi', $request->status_validasi);
+            }
+
+            // Apply role filter
+            if ($request->filled('role_filter')) {
+                $usersQuery->whereHas('roles', function ($q) use ($request) {
+                    $q->where('name', $request->role_filter);
+                });
+            }
+
+            $events = Event::with('promo')->get();
+            $users = $usersQuery->paginate(9)->appends($request->all());
+        }
+
+        return view('dashboard', array_merge(
+            $baseData,
+            $additionalData,
+            $filteredData,
+            [
+                'paginatedEvents' => $paginatedEvents,
+                'users' => $users,
+                'events' => $events ?? [],
+            ]
+        ));
     }
 
     /**
@@ -52,9 +83,9 @@ class DashboardController extends Controller
 
         if ($isAdmin) {
             return [
-                'dataPrestasi' => Prestasi::latest()->paginate($paginationCount),
-                'dataPengabdian' => Pengabdian::latest()->paginate($paginationCount),
-                'dataSertifikasi' => Sertifikasi::latest()->paginate($paginationCount),
+                'dataPrestasi' => $this->filterPrestasiForAdmin(request()),
+                'dataPengabdian' => $this->filterPengabdianForAdmin(request()),
+                'dataSertifikasi' => $this->filterSertifikasiForAdmin(request()),
                 'notifs' => []
             ];
         }
@@ -65,6 +96,153 @@ class DashboardController extends Controller
             'dataSertifikasi' => Sertifikasi::where('status_sertifikasi', 1)->latest()->paginate($paginationCount),
             'notifs' => Notifikasi::where('id_pengguna', auth()->id())->where('is_read', false)->latest()->get()
         ];
+    }
+
+    private function filterPengabdianForAdmin(Request $request)
+    {
+        $query = Pengabdian::with(['owner', 'taggedUsers']);
+
+        // Search by judul_pengabdian
+        if ($request->filled('search_pengabdian')) {
+            $searchTerm = $request->search_pengabdian;
+            $query->where('judul_pengabdian', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        // Filter by status_pengabdian
+        if ($request->filled('status_pengabdian')) {
+            $query->where('status_pengabdian', $request->status_pengabdian);
+        }
+
+        // Apply sorting
+        $sortType = $request->get('sort', 'latest');
+        switch ($sortType) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('judul_pengabdian', 'asc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Paginate with query parameters preserved
+        return $query->paginate(10)->appends($request->query());
+    }
+
+    /**
+     * Filter prestasi untuk admin
+     */
+    private function filterPrestasiForAdmin(Request $request)
+    {
+        $query = Prestasi::with(['owner', 'dokumentasi']); // Load relationships
+
+        // Search by nama_prestasi
+        if ($request->filled('search_prestasi')) {
+            $searchTerm = $request->search_prestasi;
+            $query->where('nama_prestasi', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        // Filter by status_prestasi
+        if ($request->filled('status_prestasi')) {
+            $query->where('status_prestasi', $request->status_prestasi);
+        }
+
+        // Filter by tingkatan_prestasi
+        if ($request->filled('tingkatan_prestasi')) {
+            $query->where('tingkatan_prestasi', $request->tingkatan_prestasi);
+        }
+
+        // Filter by jenis_prestasi
+        if ($request->filled('jenis_prestasi')) {
+            $query->where('jenis_prestasi', $request->jenis_prestasi);
+        }
+
+        // Apply sorting
+        $sortType = $request->get('sort_prestasi', 'latest');
+        switch ($sortType) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('nama_prestasi', 'asc');
+                break;
+            case 'tingkatan_desc':
+                $query->orderByRaw("FIELD(tingkatan_prestasi, 'Internasional', 'Nasional', 'Regional')");
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Paginate with query parameters preserved
+        return $query->paginate(10)->appends($request->query());
+    }
+
+    /**
+     * Filter sertifikasi untuk admin
+     */
+    private function filterSertifikasiForAdmin(Request $request)
+    {
+        $query = Sertifikasi::with(['owner']);
+
+        // Search by nama_sertifikasi
+        if ($request->filled('search_sertifikasi')) {
+            $query->where('nama_sertifikasi', 'LIKE', '%' . $request->search_sertifikasi . '%');
+        }
+
+        // Filter by status
+        if ($request->filled('status_sertifikasi')) {
+            $query->where('status_sertifikasi', $request->status_sertifikasi);
+        }
+
+        // Filter by masa_berlaku
+        if ($request->filled('masa_berlaku_filter')) {
+            $masaBerlakuFilter = $request->masa_berlaku_filter;
+
+            switch ($masaBerlakuFilter) {
+                case 'seumur_hidup':
+                    $query->where('masa_berlaku', 0);
+                    break;
+                case 'kurang_dari_5':
+                    $query->where('masa_berlaku', '<=', 5);
+                    break;
+                case 'kurang_dari_10':
+                    $query->where('masa_berlaku', '>', 5, 'and', 'masa_berlaku', '<=', 10);
+                    break;
+                case '10+':
+                    $query->where('masa_berlaku', '>=', 10);
+                    break;
+                default:
+                    // For numeric values (alternative version)
+                    if (is_numeric($masaBerlakuFilter)) {
+                        $query->where('masa_berlaku', (int)$masaBerlakuFilter);
+                    } elseif ($masaBerlakuFilter === '5+') {
+                        $query->where('masa_berlaku', '>', 5);
+                    }
+                    break;
+            }
+        }
+
+        // Apply sorting
+        $sortType = $request->get('sort_sertifikasi', 'latest');
+        switch ($sortType) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('nama_sertifikasi', 'asc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        return $query->paginate(10)->appends($request->query());
     }
 
     /**
@@ -101,7 +279,7 @@ class DashboardController extends Controller
     private function applyFilters(Request $request, $isAdmin)
     {
         return [
-            'dataPortofolio' => $this->filterPortofolio($request),
+            'dataPortofolio' => $this->filterPortofolio($request, $isAdmin),
             'dataEvent' => $this->filterEvent($request, $isAdmin),
             'dataOprek' => $this->filterOprek($request, $isAdmin),
             'dataDownload' => $this->filterDownload($request, $isAdmin)
@@ -111,11 +289,14 @@ class DashboardController extends Controller
     /**
      * Filter portofolio dengan search dan kategori
      */
-    private function filterPortofolio(Request $request)
+    private function filterPortofolio(Request $request, $isAdmin)
     {
-        $query = Portofolio::with(['owner', 'taggedUsers', 'kategori', 'gambar'])
-            ->where('status_portofolio', true);
+        $query = Portofolio::with(['owner', 'taggedUsers', 'kategori', 'gambar']); // Add relationships if needed
 
+        // Base filter untuk non-admin
+        if (!$isAdmin) {
+            $query->where('status_portofolio', 1);
+        }
         // Search filter
         if ($request->filled('search')) {
             $query->where('nama_portofolio', 'like', '%' . $request->search . '%');
@@ -126,6 +307,24 @@ class DashboardController extends Controller
             $query->whereHas('kategori', function ($q) use ($request) {
                 $q->whereIn('kategori_portofolio', $request->kategori);
             });
+        }
+
+        // Filter berdasarkan view count range
+        if ($request->filled('view_count_filter')) {
+            switch ($request->view_count_filter) {
+                case '0-100':
+                    $query->whereBetween('view_count', [0, 100]);
+                    break;
+                case '100-500':
+                    $query->whereBetween('view_count', [100, 500]);
+                    break;
+                case '500-1000':
+                    $query->whereBetween('view_count', [500, 1000]);
+                    break;
+                case '1000+':
+                    $query->where('view_count', '>', 1000);
+                    break;
+            }
         }
 
         // Sort filter
@@ -143,34 +342,71 @@ class DashboardController extends Controller
      */
     private function filterEvent(Request $request, $isAdmin)
     {
-        $query = Event::query();
+        $query = Event::with(['owner']); // Add relationships if needed
 
         // Base filter untuk non-admin
         if (!$isAdmin) {
             $query->where('status_event', 1);
         }
 
-        // Search filter
+        // Search filter - nama event
         if ($request->filled('search_event')) {
             $query->where('nama_event', 'like', '%' . $request->search_event . '%');
+        }
+
+        // Filter status event (untuk admin)
+        if ($request->filled('status_event') && $isAdmin) {
+            $query->where('status_event', $request->status_event);
+        }
+
+        // Filter penyelenggara
+        if ($request->filled('penyelenggara_event')) {
+            $query->where('penyelenggara_event', $request->penyelenggara_event);
+        }
+
+        // Filter jenis event
+        if ($request->filled('jenis_event')) {
+            $query->where('jenis_event', $request->jenis_event);
         }
 
         // Date filter
         $this->applyDateFilter($query, $request->get('date_filter'), 'tanggal_event');
 
-        // Other filters
-        $this->applySimpleFilters($query, $request, [
-            'penyelenggara' => 'penyelenggara_event',
-            'jenis_event' => 'jenis_event'
-        ]);
+        // Sort filter
+        $this->applyEventSorting($query, $request->get('sort_event', 'latest'));
 
-        // Status filter (khusus admin)
-        if ($request->filled('status') && $isAdmin) {
-            $status = $request->status == 'validated' ? 1 : 0;
-            $query->where('status_event', $status);
+        return $query->paginate(12)->appends($request->query());
+    }
+
+    /**
+     * Apply sorting khusus untuk event
+     */
+    private function applyEventSorting($query, $sortType)
+    {
+        switch ($sortType) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('nama_event', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('nama_event', 'desc');
+                break;
+            case 'date_asc':
+                $query->orderBy('tanggal_event', 'asc');
+                break;
+            case 'price_asc':
+                $query->orderBy('harga_event', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('harga_event', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
         }
-
-        return $query->latest()->paginate(9);
     }
 
     /**
@@ -178,41 +414,85 @@ class DashboardController extends Controller
      */
     private function filterOprek(Request $request, $isAdmin)
     {
-        $query = OprekLokerProject::query();
+        $query = OprekLokerProject::with(['owner']);
 
         // Base filter untuk non-admin
         if (!$isAdmin) {
             $query->where('status_project', 1);
         }
 
-        // Search filter
+        // Search filter - nama project
         if ($request->filled('search_oprek')) {
             $query->where('nama_project', 'like', '%' . $request->search_oprek . '%');
         }
 
-        // Deadline filter
+        // Filter status project (untuk admin)
+        if ($request->filled('status_project') && $isAdmin) {
+            $query->where('status_project', $request->status_project);
+        }
+
+        // Filter kategori project
+        if ($request->filled('kategori_project')) {
+            if (is_array($request->kategori_project)) {
+                $query->whereIn('kategori_project', $request->kategori_project);
+            } else {
+                $query->where('kategori_project', $request->kategori_project);
+            }
+        }
+
+        // Filter output project
+        if ($request->filled('output_project')) {
+            if (is_array($request->output_project)) {
+                $query->whereIn('output_project', $request->output_project);
+            } else {
+                $query->where('output_project', $request->output_project);
+            }
+        }
+
+        // Filter penyelenggara project
+        if ($request->filled('penyelenggara_project')) {
+            if (is_array($request->penyelenggara_project)) {
+                $query->whereIn('penyelenggara_project', $request->penyelenggara_project);
+            } else {
+                $query->where('penyelenggara_project', $request->penyelenggara_project);
+            }
+        }
+
+        // Date filter for deadline
         $this->applyDateFilter($query, $request->get('deadline_filter'), 'deadline_project');
 
-        // Multiple selection filters
-        $this->applyMultipleFilters($query, $request, [
-            'kategori_project' => 'kategori_project',
-            'penyelenggara_project' => 'penyelenggara_project'
-        ]);
+        // Sort filter
+        $this->applyOprekSorting($query, $request->get('sort_oprek', 'latest'));
 
-        // Single filters
-        $this->applySimpleFilters($query, $request, [
-            'output_project' => 'output_project'
-        ]);
+        return $query->paginate(12)->appends($request->query());
+    }
 
-        // Sort
-        $this->applySorting($query, $request->get('sort_oprek', 'latest'), [
-            'oldest' => ['created_at', 'asc'],
-            'deadline' => ['deadline_project', 'asc'],
-            'name' => ['nama_project', 'asc'],
-            'latest' => ['created_at', 'desc']
-        ]);
-
-        return $query->paginate(9);
+    /**
+     * Apply sorting khusus untuk oprek
+     */
+    private function applyOprekSorting($query, $sortType)
+    {
+        switch ($sortType) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('nama_project', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('nama_project', 'desc');
+                break;
+            case 'deadline_asc':
+                $query->orderBy('deadline_project', 'asc');
+                break;
+            case 'deadline_desc':
+                $query->orderBy('deadline_project', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
     }
 
     /**
@@ -271,12 +551,6 @@ class DashboardController extends Controller
             case 'this_month':
                 $query->whereMonth($column, $today->month)
                     ->whereYear($column, $today->year);
-                break;
-            case 'upcoming':
-                $query->where($column, '>=', $today->toDateString());
-                break;
-            case 'expired':
-                $query->where($column, '<', $today->toDateString());
                 break;
         }
     }
@@ -411,28 +685,32 @@ class DashboardController extends Controller
         return collect($prestasiList);
     }
 
-    private function getPaginatedEventPayments()
+    private function getPaginatedEventPayments(Request $request)
     {
-        // Ambil semua pembayaran beserta relasi event dan user
-        $allPayments = \App\Models\PembayaranEvent::with(['registration.event', 'registration.user'])
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->registration->event->id_event ?? 0;
+        $query = \App\Models\PembayaranEvent::with(['registration.event', 'registration.user']);
+
+        // Filter nama event
+        if ($request->filled('search_event')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('registration.event', function ($q2) use ($request) {
+                    $q2->where('nama_event', 'like', '%' . $request->search_event . '%');
+                })
+                    ->orWhereHas('registration.user', function ($q2) use ($request) {
+                        $q2->where('nama_pengguna', 'like', '%' . $request->search_event . '%');
+                    });
             });
+        }
 
-        // Paginasi manual per event
-        $perPage = 20;
-        $currentPage = request('page', 1);
-        $events = $allPayments->values();
-        $paginatedEvents = new \Illuminate\Pagination\LengthAwarePaginator(
-            $events->forPage($currentPage, $perPage),
-            $events->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+        // Filter status validasi
+        if ($request->filled('status_validasi')) {
+            $query->where('status_validasi', $request->status_validasi);
+        }
 
-        return $paginatedEvents;
+        // Urutkan terbaru
+        $query->latest();
+
+        // PAGINATE langsung, JANGAN groupBy!
+        return $query->paginate(15)->appends($request->all());
     }
 
     public function validasiUser(User $user)

@@ -255,7 +255,7 @@ class PrestasiController extends Controller
             $prestasi->save();
 
             Notifikasi::create([
-                'isi_notifikasi' => 'Oprek "' . $prestasi->nama_prestasi . '" telah divalidasi oleh admin.',
+                'isi_notifikasi' => 'Prestasi "' . $prestasi->nama_prestasi . '" telah divalidasi oleh admin.',
                 'notifiable_id' => $prestasi->id_prestasi,
                 'notifiable_type' => 'prestasi',
                 'id_pengguna' => $prestasi->id_pengguna,

@@ -89,7 +89,7 @@ class SertifikasiController extends Controller
     {
         $sertifikasi = Sertifikasi::findOrFail($id);
 
-        if ($sertifikasi->id_pengguna !== auth()->id()) {
+        if ($sertifikasi->id_pengguna !== auth()->user()->id_pengguna) {
             abort(403, 'Anda tidak memiliki izin untuk mengedit sertifikasi ini.');
         }
 
@@ -98,9 +98,16 @@ class SertifikasiController extends Controller
             'deskripsi_sertifikasi' => 'required|string',
             'tanggal_sertifikasi' => 'required|date',
             'penyelenggara' => 'required|string|max:255',
-            'masa_berlaku' => 'required|integer|min:0',
-            'file_sertifikasi' => 'required|file|mimes:pdf|max:2048',
+            'masa_berlaku' => 'nullable|integer|min:1',
+            'seumur_hidup' => 'nullable|boolean',
+            'file_sertifikasi' => 'nullable|file|mimes:pdf|max:2048', // ✅ nullable = optional
         ]);
+
+        $masaBerlaku = $request->has('seumur_hidup') && $request->seumur_hidup == 1 ? 0 : $request->masa_berlaku;
+
+        if (!$request->has('seumur_hidup') && ($masaBerlaku === null || $masaBerlaku < 1)) {
+            return back()->with('error', 'Harap masukkan jumlah tahun atau pilih "Seumur Hidup".')->withInput();
+        }
 
         DB::beginTransaction();
 
@@ -109,26 +116,25 @@ class SertifikasiController extends Controller
             $sertifikasi->deskripsi_sertifikasi = $request->deskripsi_sertifikasi;
             $sertifikasi->tanggal_sertifikasi = $request->tanggal_sertifikasi;
             $sertifikasi->penyelenggara = $request->penyelenggara;
-            $sertifikasi->masa_berlaku = $request->masa_berlaku;
-            $sertifikasi->save();
+            $sertifikasi->masa_berlaku = $masaBerlaku ?? 0;
 
             if ($request->hasFile('file_sertifikasi')) {
-                // Hapus dokumen lama jika ada
-                if ($sertifikasi->file_sertifikasi && Storage::exists('public/' . $sertifikasi->file_sertifikasi)) {
-                    Storage::delete('public/' . $sertifikasi->file_sertifikasi);
+                if ($sertifikasi->file_sertifikasi && Storage::disk('public')->exists($sertifikasi->file_sertifikasi)) {
+                    Storage::disk('public')->delete($sertifikasi->file_sertifikasi);
                 }
 
-                // Simpan dokumen baru
                 $path = $request->file('file_sertifikasi')->store('sertifikasi', 'public');
                 $sertifikasi->file_sertifikasi = $path;
             }
+
+            $sertifikasi->save();
 
             DB::commit();
 
             return redirect()->route('sertifikasi.show', $id)->with('success', 'Sertifikasi berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
     }
 

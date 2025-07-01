@@ -672,14 +672,6 @@
                                     </h3>
                                     <p class="text-gray-600 mb-3">{{ $file->deskripsi_download }}</p>
                                     <div class="flex gap-4 text-sm text-gray-500">
-                                        <span>
-                                            Ukuran:
-                                            @if ($file->ukuran_file)
-                                                {{ number_format($file->ukuran_file / 1024, 2) }} KB
-                                            @else
-                                                -
-                                            @endif
-                                        </span>
                                         <span>Oleh: {{ $file->pengguna->nama_pengguna ?? 'Unknown' }}</span>
                                     </div>
                                 </div>

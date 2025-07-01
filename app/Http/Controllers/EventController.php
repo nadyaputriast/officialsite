@@ -128,23 +128,23 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        $request->merge([
-            'waktu_event' => $request->input('waktu_event') . ':00',
-        ]);
+        // $request->merge([
+        //     'waktu_event' => $request->input('waktu_event') . ':00',
+        // ]);
 
         $request->validate([
             'nama_event' => 'required|string|max:255',
             'jenis_event' => 'required|string|in:seminar,workshop,bootcamp,pameran,konferensi',
             'tanggal_event' => 'required|date',
-            'waktu_event' => 'required|date_format:H:i:s',
+            'waktu_event' => 'required|date_format:H:i', // hanya H:i dari HTML <input type="time">
             'deskripsi_event' => 'required|string',
             'penyelenggara_event' => 'required|string|in:internal,eksternal',
             'nama_penyelenggara' => 'required|string|max:255',
             'harga_event' => 'required|numeric|min:0',
-            'nilai_promo' => 'nullable|integer|min:0',
             'tautan_event' => 'nullable|url|required_if:penyelenggara_event,eksternal',
             'kuota_event' => 'nullable|integer|min:1',
             'kode_promo' => 'nullable|string|max:50',
+            'nilai_promo' => 'nullable|integer|min:0',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_mulai',
             'thumbnail_event' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -162,7 +162,6 @@ class EventController extends Controller
                 'penyelenggara_event',
                 'nama_penyelenggara',
                 'harga_event',
-                'nilai_promo',
                 'tautan_event',
                 'kuota_event'
             ]));
@@ -173,21 +172,20 @@ class EventController extends Controller
 
             $event->save();
 
-            // Update promo jika event internal
-            if ($request->penyelenggara_event === 'internal') {
-                $jenisPromo = $request->nilai_promo > 100 ? 'Potongan Harga' : 'Persentase';
-                if ($jenisPromo === 'Persentase') {
-                    $hargaPromo = ($request->harga_event * (100 - $request->nilai_promo)) / 100;
-                } else {
-                    $hargaPromo = $request->harga_event - $request->nilai_promo;
-                }
+            if ($request->penyelenggara_event === 'internal' && $request->harga_event > 0) {
+                $nilaiPromo = $request->nilai_promo ?? 0;
+                $jenisPromo = $nilaiPromo > 100 ? 'Potongan Harga' : 'Persentase';
+
+                $hargaPromo = $jenisPromo === 'Persentase'
+                    ? ($request->harga_event * (100 - $nilaiPromo)) / 100
+                    : $request->harga_event - $nilaiPromo;
 
                 $promo = $event->promo;
                 if ($promo) {
                     $promo->update([
                         'kode_promo' => $request->kode_promo,
                         'jenis_promo' => $jenisPromo,
-                        'nilai_promo' => $request->nilai_promo,
+                        'nilai_promo' => $nilaiPromo,
                         'harga_promo' => $hargaPromo,
                         'tanggal_mulai' => $request->tanggal_mulai,
                         'tanggal_berakhir' => $request->tanggal_berakhir,
@@ -196,11 +194,15 @@ class EventController extends Controller
                     $event->promo()->create([
                         'kode_promo' => $request->kode_promo,
                         'jenis_promo' => $jenisPromo,
-                        'nilai_promo' => $request->nilai_promo,
+                        'nilai_promo' => $nilaiPromo,
                         'harga_promo' => $hargaPromo,
                         'tanggal_mulai' => $request->tanggal_mulai,
                         'tanggal_berakhir' => $request->tanggal_berakhir,
                     ]);
+                }
+            } else {
+                if ($event->promo) {
+                    $event->promo->delete();
                 }
             }
 

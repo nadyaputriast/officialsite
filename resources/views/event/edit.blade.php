@@ -4,10 +4,12 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-semibold mb-4">Edit Event</h3>
+
                     <form action="{{ route('event.update', $event->id_event) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
                         @if ($errors->any())
                             <div class="alert alert-danger">
                                 <ul>
@@ -45,7 +47,7 @@
                             </select>
                         </div>
 
-                        {{-- Deskripsi Event --}}
+                        {{-- Deskripsi --}}
                         <div class="mb-4">
                             <label for="deskripsi_event" class="block text-sm font-medium text-gray-700">Deskripsi
                                 Event</label>
@@ -53,7 +55,7 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>{{ $event->deskripsi_event }}</textarea>
                         </div>
 
-                        {{-- Tanggal Event --}}
+                        {{-- Tanggal & Waktu --}}
                         <div class="mb-4">
                             <label for="tanggal_event" class="block text-sm font-medium text-gray-700">Tanggal
                                 Event</label>
@@ -62,15 +64,14 @@
                                 value="{{ $event->tanggal_event }}" required>
                         </div>
 
-                        {{-- Waktu Event --}}
                         <div class="mb-4">
                             <label for="waktu_event" class="block text-sm font-medium text-gray-700">Waktu Event</label>
                             <input type="time" name="waktu_event" id="waktu_event"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                value="{{ $event->waktu_event }}" required>
+                                value="{{ \Carbon\Carbon::parse($event->waktu_event)->format('H:i') }}" required>
                         </div>
 
-                        {{-- Penyelenggara Event --}}
+                        {{-- Penyelenggara --}}
                         <div class="mb-4">
                             <label for="penyelenggara_event"
                                 class="block text-sm font-medium text-gray-700">Penyelenggara Event</label>
@@ -86,7 +87,6 @@
                             </select>
                         </div>
 
-                        {{-- Nama Penyelenggara --}}
                         <div class="mb-4">
                             <label for="nama_penyelenggara" class="block text-sm font-medium text-gray-700">Nama
                                 Penyelenggara</label>
@@ -95,7 +95,7 @@
                                 value="{{ $event->nama_penyelenggara }}" required>
                         </div>
 
-                        {{-- Tautan Event (Hanya untuk Eksternal) --}}
+                        {{-- Tautan (Eksternal) --}}
                         <div id="tautan-field"
                             class="mb-4 {{ $event->penyelenggara_event == 'eksternal' ? '' : 'hidden' }}">
                             <label for="tautan_event" class="block text-sm font-medium text-gray-700">Tautan
@@ -105,7 +105,7 @@
                                 value="{{ $event->tautan_event }}">
                         </div>
 
-                        {{-- Harga Event --}}
+                        {{-- Harga --}}
                         <div class="mb-4">
                             <label for="harga_event" class="block text-sm font-medium text-gray-700">Harga Event</label>
                             <input type="number" name="harga_event" id="harga_event"
@@ -113,10 +113,8 @@
                                 value="{{ $event->harga_event }}" required onchange="toggleFields()">
                         </div>
 
-                        {{-- Field Tambahan untuk Internal --}}
-                        <div id="internal-fields"
-                            class="{{ $event->penyelenggara_event == 'internal' ? '' : 'hidden' }}">
-                            {{-- Kuota Event --}}
+                        {{-- Kuota (Internal saja) --}}
+                        <div id="kuota-field" class="{{ $event->penyelenggara_event == 'internal' ? '' : 'hidden' }}">
                             <div class="mb-4">
                                 <label for="kuota_event" class="block text-sm font-medium text-gray-700">Kuota
                                     Event</label>
@@ -124,8 +122,11 @@
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     value="{{ $event->kuota_event }}">
                             </div>
+                        </div>
 
-                            {{-- Promo --}}
+                        {{-- Promo Fields (Internal + Harga > 0) --}}
+                        <div id="promo-fields"
+                            class="{{ $event->penyelenggara_event == 'internal' && $event->harga_event > 0 ? '' : 'hidden' }}">
                             <div class="mb-4">
                                 <label for="kode_promo" class="block text-sm font-medium text-gray-700">Kode Promo
                                     (Opsional)</label>
@@ -134,7 +135,6 @@
                                     value="{{ $event->promo->kode_promo ?? '' }}">
                             </div>
 
-                            {{-- Jenis Promo --}}
                             <div class="mb-4">
                                 <label for="jenis_promo" class="block text-sm font-medium text-gray-700">Jenis
                                     Promo</label>
@@ -151,7 +151,6 @@
                                 </select>
                             </div>
 
-                            {{-- Nilai Promo --}}
                             <div class="mb-4">
                                 <label for="nilai_promo" class="block text-sm font-medium text-gray-700">Nilai
                                     Promo</label>
@@ -160,7 +159,6 @@
                                     value="{{ optional($event->promo)->nilai_promo ?? 0 }}" step="1">
                             </div>
 
-                            {{-- Masa Berlaku Promo --}}
                             <div class="mb-4">
                                 <label for="tanggal_mulai" class="block text-sm font-medium text-gray-700">Tanggal
                                     Mulai Promo</label>
@@ -168,6 +166,7 @@
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     value="{{ optional($event->promo)->tanggal_mulai ?? '' }}">
                             </div>
+
                             <div class="mb-4">
                                 <label for="tanggal_berakhir" class="block text-sm font-medium text-gray-700">Tanggal
                                     Berakhir Promo</label>
@@ -177,68 +176,64 @@
                             </div>
                         </div>
 
-                        {{-- Thumbnail Event --}}
-                        {{-- <div class="mb-4">
+                        {{-- Thumbnail --}}
+                        <div class="mb-4">
                             <label for="thumbnail_event" class="block text-sm font-medium text-gray-700">Thumbnail
                                 Event</label>
-                            <input type="file" name="thumbnail_event" id="thumbnail_event"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                        </div> --}}
-
-                        {{-- Gambar/Flyer Informasi --}}
-                        <div class="mb-4">
-                            <label for="thumbnail_event" class="block text-sm font-medium text-gray-700">Thumbnail Event</label>
                             @if ($event->thumbnail_event)
                                 <div class="mt-2">
-                                    <img src="{{ asset('storage/' . $event->thumbnail_event) }}"
-                                        alt="Flyer Informasi" class="w-32 h-32 object-cover rounded">
+                                    <img src="{{ asset('storage/' . $event->thumbnail_event) }}" alt="Flyer"
+                                        class="w-32 h-32 object-cover rounded">
                                     <button type="button" id="hapus-flyer"
-                                        class="ml-4 px-3 py-1 bg-red-500 text-black rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                                        class="ml-4 px-3 py-1 bg-red-500 text-black rounded hover:bg-red-600">
                                         Hapus Thumbnail
                                     </button>
                                 </div>
                             @endif
                             <div id="unggah-flyer" class="mt-4 {{ $event->thumbnail_event ? 'hidden' : '' }}">
                                 <input type="file" name="thumbnail_event" id="thumbnail_event"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                                 <p class="text-xs text-gray-500 mt-1">Unggah flyer baru (JPG, PNG). Maksimal 2MB.</p>
                             </div>
                         </div>
 
                         <button type="submit"
-                            class="px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan
+                            class="px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600">Simpan
                             Perubahan</button>
                         <a href="{{ route('event.show', $event->id_event) }}"
                             class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Batal</a>
-
-                        {{-- Submit Button --}}
-                        {{-- <button type="submit"
-                            class="px-4 py-2 bg-blue-500 text-black rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                            Simpan
-                        </button>
-                        <a href="{{ route('dashboard') }}" class="px-4 py-2 text-black rounded">Kembali</a> --}}
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- Script --}}
     <script>
         function toggleFields() {
             const penyelenggara = document.getElementById('penyelenggara_event').value;
             const hargaEvent = parseFloat(document.getElementById('harga_event').value || 0);
             const tautanField = document.getElementById('tautan-field');
-            const internalFields = document.getElementById('internal-fields');
+            const kuotaField = document.getElementById('kuota-field');
+            const promoFields = document.getElementById('promo-fields');
 
             if (penyelenggara === 'eksternal') {
                 tautanField.classList.remove('hidden');
-                internalFields.classList.add('hidden');
-            } else if (penyelenggara === 'internal' && hargaEvent > 0) {
+                kuotaField.classList.add('hidden');
+                promoFields.classList.add('hidden');
+            } else if (penyelenggara === 'internal') {
                 tautanField.classList.add('hidden');
-                internalFields.classList.remove('hidden');
+                kuotaField.classList.remove('hidden');
+
+                if (hargaEvent > 0) {
+                    promoFields.classList.remove('hidden');
+                } else {
+                    promoFields.classList.add('hidden');
+                }
             } else {
                 tautanField.classList.add('hidden');
-                internalFields.classList.add('hidden');
+                kuotaField.classList.add('hidden');
+                promoFields.classList.add('hidden');
             }
         }
 
@@ -256,6 +251,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            toggleFields();
+
             const hapusFlyerBtn = document.getElementById('hapus-flyer');
             const unggahFlyerDiv = document.getElementById('unggah-flyer');
 
@@ -270,9 +267,7 @@
                         const form = hapusFlyerBtn.closest('form');
                         form.appendChild(hiddenInput);
 
-                        const currentFlyerInfo = hapusFlyerBtn.closest('div');
-                        currentFlyerInfo.style.display = 'none';
-
+                        hapusFlyerBtn.closest('div').style.display = 'none';
                         unggahFlyerDiv.classList.remove('hidden');
                     }
                 });

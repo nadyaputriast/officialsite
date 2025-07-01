@@ -31,7 +31,7 @@ class OprekLokerProject extends Model
 
     protected $casts = [
         'status_project' => 'boolean',
-    ];   
+    ];
 
     public function owner()
     {
@@ -41,5 +41,38 @@ class OprekLokerProject extends Model
     public function kualifikasi()
     {
         return $this->hasMany(KualifikasiOprek::class, 'id_oprek', 'id_oprek');
+    }
+
+    public function getKualifikasiStringAttribute()
+    {
+        return $this->kualifikasi->pluck('kualifikasi_oprek')->join(', ');
+    }
+
+    public function getKualifikasiArrayAttribute()
+    {
+        return $this->kualifikasi->pluck('kualifikasi_oprek')->toArray();
+    }
+
+    public function notifikasi()
+    {
+        return $this->hasMany(Notifikasi::class, 'notifiable_id')
+            ->where('notifiable_type', 'oprek_loker_project');
+    }
+
+    public function latestNotifikasi()
+    {
+        return $this->hasOne(Notifikasi::class, 'notifiable_id')
+            ->where('notifiable_type', 'oprek_loker_project')
+            ->latest();
+    }
+
+    public function isExpired()
+    {
+        return $this->deadline_project && $this->deadline_project < now()->toDateString();
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status_project', 1);
     }
 }
