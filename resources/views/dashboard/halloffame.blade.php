@@ -1,6 +1,6 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-8">
-        <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
             <div class="text-yellow-600">
             </div>
             <h2 class="text-3xl font-bold text-center mb-2 mt-8">🏆Proyek Unggulan Mahasiswa🏆</h2>
@@ -10,14 +10,14 @@
     </div>
     {{-- Top 3 Portofolio --}}
     <div class="mb-12">
-        <div class="flex items-center justify-center gap-2 mb-6">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
             <div class="text-blue-600">
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @forelse ($topPortofolio as $index => $p)
                 <div
-                    class="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
+                    class="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative flex flex-col">
                     @if ($index === 0)
                         <div
                             class="absolute -top-3 -right-3 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
@@ -31,7 +31,7 @@
                             class="absolute -top-3 -right-3 bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
                             3</div>
                     @endif
-                    <div class="text-center">
+                    <div class="text-center flex-1 flex flex-col">
                         @if ($p->gambar && $p->gambar->first())
                             <div class="w-full h-40 bg-gray-200 rounded-xl overflow-hidden mb-4">
                                 <img src="{{ asset('storage/' . $p->gambar->first()->gambar_portofolio) }}"
@@ -95,14 +95,14 @@
                                 @endforeach
                             @endif
                         </div>
-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mt-auto">
                             <div class="text-2xl font-bold text-blue-600">{{ $p->view_count }}</div>
                             <div class="text-sm text-gray-500">views</div>
                         </div>
                     </div>
                 </div>
             @empty
-                <div class="col-span-3 text-center py-12 bg-white rounded-xl border border-gray-200">
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 text-center py-12 bg-white rounded-xl border border-gray-200">
                     <div class="text-gray-400 mb-4">
                         <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
@@ -118,7 +118,7 @@
     </div>
     {{-- Top Prestasi --}}
     <div>
-        <div class="flex items-center justify-center gap-2 mb-6">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
             <div class="text-green-600">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -133,7 +133,7 @@
                 </svg>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
             @if ($topPrestasi && count($topPrestasi) > 0)
                 @foreach ($topPrestasi as $prestasi)
                     <div
@@ -168,7 +168,7 @@
                     </div>
                 @endforeach
             @else
-                <div class="col-span-1 md:col-span-3 text-center text-gray-500 py-8">
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 text-center text-gray-500 py-8">
                     <p>Belum ada prestasi bulan ini</p>
                 </div>
             @endif

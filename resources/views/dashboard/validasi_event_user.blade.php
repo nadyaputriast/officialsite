@@ -1,12 +1,12 @@
 @if (auth()->user()->hasRole('admin'))
-    <div class="py-12">
         <section class="bg-[#DDF1FB]">
             <div id="pembayaran-section" class="py-12">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="bg-white rounded-xl p-4 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
                         <div class="p-6 text-gray-900">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                             <h3 class="text-lg font-semibold mb-4">Validasi Pembayaran Event</h3>
-
+                    </div>
                             {{-- SEARCH & FILTER --}}
                             <form method="GET" class="mb-4 flex flex-wrap gap-3 items-center">
                                 <input type="hidden" name="tab" value="validasi_event">
@@ -22,10 +22,11 @@
                                 </select>
                                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Cari</button>
                                 <a href="{{ route('dashboard') }}?tab=validasi_event"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded">Reset</a>
+                                    class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">Reset</a>
                             </form>
 
-                            <table class="table-auto w-full border-collapse border border-gray-300 mb-4">
+                            <div class="overflow-x-auto">
+                            <table class="table-auto w-full border-collapse border border-gray-300">
                                 <thead>
                                     <tr class="bg-gray-100">
                                         <th class="border border-gray-300 px-4 py-2">Nama Event</th>
@@ -91,9 +92,10 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
 
                             {{-- PAGINATION --}}
-                            <div class="text-sm text-gray-600">
+                            <div class="text-sm text-gray-600 mt-4">
                                 Menampilkan <strong>{{ $paginatedEvents->count() }}</strong> dari
                                 <strong>{{ $paginatedEvents->total() }}</strong> validasi pembayaran
                             </div>
@@ -103,5 +105,4 @@
                 </div>
             </div>
         </section>
-    </div>
 @endif

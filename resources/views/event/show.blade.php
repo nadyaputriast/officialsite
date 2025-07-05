@@ -53,7 +53,8 @@
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h4 class="text-xl font-bold text-green-800 mb-1">Pendaftaran Berhasil!</h4>
+                                                <h4 class="text-xl font-bold text-green-800 mb-1">Pendaftaran Berhasil!
+                                                </h4>
                                                 @if ($myRegistration->nomor_tiket)
                                                     <div class="flex items-center space-x-2 mb-2">
                                                         <span class="text-green-700 font-medium">Nomor Tiket:</span>
@@ -213,13 +214,23 @@
                                     <div>
                                         <span class="font-semibold">Promo:</span>
                                         <div class="text-blue-700">
-                                            <p><strong>Kode:</strong> {{ $event->promo->first()->kode_promo }}</p>
-                                            <p><strong>Diskon:</strong>
-                                                {{ $event->promo->first()->nilai_promo }}{{ $event->promo->first()->jenis_promo == 'Persentase' ? '%' : '' }}
-                                            </p>
-                                            <p><strong>Harga Promo:</strong>
-                                                Rp{{ number_format($event->promo->first()->harga_promo, 0, ',', '.') }}
-                                            </p>
+                                            @php
+                                                $currentPromo = $event->promo
+                                                    ->where('id_event', $event->id_event)
+                                                    ->first();
+                                            @endphp
+
+                                            @if ($currentPromo)
+                                                <p><strong>Kode:</strong> {{ $currentPromo->kode_promo }}</p>
+                                                <p><strong>Diskon:</strong>
+                                                    {{ $currentPromo->nilai_promo }}{{ $currentPromo->jenis_promo == 'Persentase' ? '%' : '' }}
+                                                </p>
+                                                <p><strong>Harga Promo:</strong>
+                                                    Rp{{ number_format($currentPromo->harga_promo, 0, ',', '.') }}
+                                                </p>
+                                            @else
+                                                <p class="text-gray-500 italic">Promo tidak tersedia untuk event ini</p>
+                                            @endif
                                         </div>
                                     </div>
                                 @endif

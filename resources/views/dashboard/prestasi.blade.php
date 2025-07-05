@@ -1,9 +1,9 @@
 <section class="bg-[#DDF1FB]">
-    <div id="prestasi-section" class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+    <div id="event-section" class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl p-4 sm:p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
+                <div class="p-0 sm:p-6 text-gray-900">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                         <h3 class="text-lg font-semibold">Informasi Prestasi</h3>
                     </div>
 
@@ -86,36 +86,31 @@
                                         Cari
                                     </button>
                                     <a href="{{ route('dashboard', ['tab' => 'prestasi']) }}"
-                                        class="bg-blue-600 text-white px-4 py-2 rounded">
+                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
                                         Reset
                                     </a>
                                 </div>
                             </form>
                         </div>
-                </div>
 
                 <div class="overflow-x-auto">
                     <table class="table-auto w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Nama Prestasi</th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Deskripsi Prestasi
-                                </th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Tanggal Perolehan
-                                </th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Tingkatan Prestasi
-                                </th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Jenis Prestasi</th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Dokumentasi</th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Komentar/Notifikasi
-                                </th>
-                                <th class="border border-gray-300 px-4 py-2" rowspan="2">Status</th>
-                                <th class="border border-gray-300 px-4 py-2" colspan="2">Aksi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Nama Prestasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Deskripsi Prestasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Tanggal Perolehan</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Tingkatan Prestasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Jenis Prestasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Dokumentasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Komentar/Notifikasi</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Status</th>
+                                <th class="border border-gray-300 px-2 sm:px-4 py-2">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($dataPrestasi as $prestasi)
-                                <tr>
+                                <tr class="hover:bg-gray-50">
                                     <td class="border border-gray-300 px-4 py-2">
                                         {{ $prestasi->nama_prestasi }}</td>
                                     <td class="border border-gray-300 px-4 py-2">
@@ -211,8 +206,8 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
-                                                        class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                                                        onclick="return confirm('Yakin ingin menghapus prestasi ini?')">
+                                                        class="bg-red-400 text-white px-2 py-1 rounded opacity-60 cursor-not-allowed"
+                                                        disabled>
                                                         Hapus
                                                     </button>
                                                 </form>
@@ -230,6 +225,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 {{-- Paginasi untuk Admin --}}
                 <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="text-sm text-gray-600">

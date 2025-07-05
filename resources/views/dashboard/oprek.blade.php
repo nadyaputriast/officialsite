@@ -1,15 +1,15 @@
 {{-- Informasi Oprek --}}
 <section class="bg-[#DDF1FB]">
     <div id="oprek-section" class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-4 px-2 lg:px-8">
             <div
-                class="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+                class="bg-white rounded-xl p-4 sm:p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
+                <div class="p-2 sm:p-6 text-gray-900">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
                         <h3 class="text-lg font-semibold">Informasi Oprek</h3>
                         @auth
                             <a href="{{ route('oprek.create') }}"
-                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto text-center">
                                 + Tambah Oprek
                             </a>
                         @endauth
@@ -21,7 +21,7 @@
                             <form method="GET" class="space-y-4">
                                 <input type="hidden" name="tab" value="oprek">
 
-                                <div class="grid md:grid-cols-4 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     {{-- Search Bar --}}
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Cari Project</label>
@@ -100,8 +100,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Filter Tanggal --}}
-                                <div class="grid md:grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Filter
                                             Deadline</label>
@@ -163,54 +162,49 @@
                                     </div>
                                 </div>
 
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 mt-4">
                                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
                                         Cari
                                     </button>
                                     <a href="{{ route('dashboard', ['tab' => 'oprek']) }}"
-                                        class="bg-blue-600 text-white px-4 py-2 rounded">
+                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
                                         Reset
                                     </a>
                                 </div>
                             </form>
                         </div>
 
-                        {{-- Tampilan untuk Admin --}}
+                        {{-- Table Responsive --}}
                         <div class="overflow-x-auto">
                             <table class="table-auto w-full border-collapse border border-gray-300">
                                 <thead>
                                     <tr class="bg-gray-100">
-                                        <th class="border border-gray-300 px-4 py-2">Nama Project</th>
-                                        <th class="border border-gray-300 px-4 py-2">Deskripsi Project</th>
-                                        <th class="border border-gray-300 px-4 py-2">Penyelenggara Project</th>
-                                        <th class="border border-gray-300 px-4 py-2">Nama Penyelenggara</th>
-                                        <th class="border border-gray-300 px-4 py-2">Kategori</th>
-                                        <th class="border border-gray-300 px-4 py-2">Output</th>
-                                        <th class="border border-gray-300 px-4 py-2">Kualifikasi Oprek</th>
-                                        <th class="border border-gray-300 px-4 py-2">Deadline</th>
-                                        <th class="border border-gray-300 px-4 py-2">Tautan Pendaftaran</th>
-                                        <th class="border border-gray-300 px-4 py-2">Flyer Informasi</th>
-                                        <th class="border border-gray-300 px-4 py-2">Status</th>
-                                        <th class="border border-gray-300 px-4 py-2">Komentar</th>
-                                        <th class="border border-gray-300 px-4 py-2">Aksi</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Nama Project</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Deskripsi Project</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Penyelenggara Project</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Nama Penyelenggara</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Kategori</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Output</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Kualifikasi Oprek</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Deadline</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Tautan Pendaftaran</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Flyer Informasi</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Status</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Komentar</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($dataOprek as $oprek)
                                         <tr class="hover:bg-gray-50">
-                                            <td class="border border-gray-300 px-4 py-2">{{ $oprek->nama_project }}
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->nama_project }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
                                                 {{ Str::limit($oprek->deskripsi_project, 50) }}</td>
-                                            <td class="border border-gray-300 px-4 py-2">{{ $oprek->penyelenggara }}
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">
-                                                {{ $oprek->nama_penyelenggara }}</td>
-                                            <td class="border border-gray-300 px-4 py-2">{{ $oprek->kategori_project }}
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">{{ $oprek->output_project }}
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->penyelenggara }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->nama_penyelenggara }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->kategori_project }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->output_project }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
                                                 @if ($oprek->kualifikasi->count() > 0)
                                                     <div class="space-y-1 max-w-xs">
                                                         @foreach ($oprek->kualifikasi as $kualifikasi)
@@ -218,13 +212,12 @@
                                                         @endforeach
                                                     </div>
                                                 @else
-                                                    <span class="text-gray-400 text-sm">Tidak ada kualifikasi
-                                                        khusus</span>
+                                                    <span class="text-gray-400 text-sm">Tidak ada kualifikasi khusus</span>
                                                 @endif
                                             </td>
-                                            <td class="border border-gray-300 px-4 py-2">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
                                                 @if ($oprek->deadline_project)
-                                                    {{ date('d M Y', strtotime($oprek->deadline_project)) }}</>
+                                                    {{ date('d M Y', strtotime($oprek->deadline_project)) }}
                                                     @if ($oprek->isExpired())
                                                         <div class="text-red-600">Berakhir</div>
                                                     @else
@@ -232,16 +225,14 @@
                                                     @endif
                                                 @endif
                                             </td>
-                                            <td class="border border-gray-300 px-4 py-2">{{ $oprek->tautan_project }}
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">
-                                                <a href="{{ Storage::url($oprek->flyer_informasi) }}"
-                                                    target="_blank">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">{{ $oprek->tautan_project }}</td>
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
+                                                <a href="{{ Storage::url($oprek->flyer_informasi) }}" target="_blank">
                                                     <img src="{{ Storage::url($oprek->flyer_informasi) }}"
-                                                        alt="Flyer Informasi" class="w-32 h-auto rounded shadow" />
+                                                        alt="Flyer Informasi" class="w-20 sm:w-32 h-auto rounded shadow" />
                                                 </a>
                                             </td>
-                                            <td class="border border-gray-300 px-4 py-2">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
                                                 @if ($oprek->status_project == 1)
                                                     <span
                                                         class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -254,7 +245,7 @@
                                                     </span>
                                                 @endif
                                             </td>
-                                            <td class="border border-gray-300 px-4 py-2">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
                                                 @php
                                                     $notif = \App\Models\Notifikasi::where(
                                                         'notifiable_id',
@@ -284,8 +275,8 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <td class="border border-gray-300 px-4 py-2">
-                                                <div class="flex gap-2 flex-wrap">
+                                            <td class="border border-gray-300 px-2 sm:px-4 py-2">
+                                                <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
                                                     {{-- Validation Button --}}
                                                     @if ($oprek->status_project == 0)
                                                         <form
@@ -315,8 +306,8 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit"
-                                                                class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                                                                onclick="return confirm('Yakin ingin menghapus informasi hiring ini?')">
+                                                                class="bg-red-400 text-white px-2 py-1 rounded opacity-60 cursor-not-allowed"
+                                                                disabled>
                                                                 Hapus
                                                             </button>
                                                         </form>
@@ -326,7 +317,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center text-gray-500 py-8">
+                                            <td colspan="13" class="text-center text-gray-500 py-8">
                                                 <div class="flex flex-col items-center">
                                                     Tidak ada project yang sesuai filter.
                                                 </div>
@@ -351,7 +342,7 @@
                         {{-- Search & Filter Bar --}}
                         <div class="mb-6 bg-gray-50 rounded-lg p-4">
                             <form method="GET" action="{{ route('dashboard') }}#oprek-section" class="space-y-4">
-                                <div class="grid md:grid-cols-4 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     {{-- Search Bar --}}
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Cari
@@ -501,13 +492,13 @@
                                     </div>
                                 </div>
 
-                                <div class="flex gap-3">
+                                <div class="flex flex-col sm:flex-row gap-3">
                                     <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium w-full sm:w-auto">
                                         Cari
                                     </button>
                                     <a href="{{ route('dashboard') }}#oprek-section"
-                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
+                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium w-full sm:w-auto text-center">
                                         Reset
                                     </a>
                                 </div>
@@ -515,7 +506,7 @@
                         </div>
 
                         {{-- Results Info --}}
-                        <div class="mb-4 flex justify-between items-center">
+                        <div class="mb-4 flex flex-col sm:flex-row justify-between items-center gap-2">
                             <div class="text-sm text-gray-600">
                                 Menampilkan {{ $dataOprek->count() }} dari {{ $dataOprek->total() }} project
                                 @if (request('search_oprek'))
@@ -527,11 +518,11 @@
                         {{-- Grid Oprek --}}
                         @forelse ($dataOprek as $oprek)
                             @if ($loop->first)
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             @endif
 
                             <div
-                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden flex flex-col h-full">
                                 {{-- Header --}}
                                 <div class="p-4 border-b border-gray-100">
                                     <div class="flex justify-between items-start mb-2">
@@ -599,7 +590,7 @@
                                 </div>
 
                                 {{-- Content --}}
-                                <div class="p-4">
+                                <div class="p-4 flex flex-col flex-1">
                                     <p class="text-gray-600 text-sm mb-4 line-clamp-3">
                                         {{ $oprek->deskripsi_project }}
                                     </p>
@@ -612,7 +603,7 @@
                                     @endif
 
                                     <a href="{{ route('oprek.show', $oprek->id_oprek) }}"
-                                        class="block w-full bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                                        class="block w-full bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium mt-auto">
                                         Lihat Detail
                                     </a>
                                 </div>
@@ -676,6 +667,17 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            table th, table td {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                font-size: 0.85rem !important;
+            }
+            .p-6 {
+                padding: 1rem !important;
+            }
         }
     </style>
 </section>

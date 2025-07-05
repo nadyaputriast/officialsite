@@ -1,15 +1,22 @@
 <section class="bg-[#DDF1FB]">
     <div id="portofolio-section" class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+                class="bg-white rounded-xl p-4 sm:p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
+                <div class="p-0 sm:p-6 text-gray-900">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                         <h3 class="text-lg text-center font-semibold">Informasi Portofolio</h3>
+                        @auth
+                            <a href="{{ route('portofolio.create') }}"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition text-center">
+                                + Tambah Portofolio
+                            </a>
+                        @endauth
                     </div>
 
                     @if (auth()->user()->hasRole('admin'))
                         <div class="mb-6 bg-gray-50 rounded-lg p-4">
+                            {{-- ...form filter admin (tidak diubah) --}}
                             <form method="GET" class="space-y-4">
                                 <input type="hidden" name="tab" value="portofolio">
 
@@ -120,48 +127,39 @@
                                     </div>
                                 </div>
 
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 mt-8">
                                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
                                         Cari
                                     </button>
                                     <a href="{{ route('dashboard', ['tab' => 'portofolio']) }}"
-                                        class="bg-blue-600 text-white px-4 py-2 rounded">
+                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
                                         Reset
                                     </a>
-                                </div>
                             </form>
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="table-auto w-full border-collapse border border-gray-300">
+                            <table class="table-auto w-full border-collapse border border-gray-300 mt-6">
                                 <thead>
                                     <tr class="bg-gray-100">
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Nama Portofolio</th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Deskripsi Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Banyak Dilihat
-                                            (kali)
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Banyak Upvote</th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Banyak Downvote</th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Dokumen Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Kategori Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Gambar Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Tautan Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Tools Portofolio
-                                        </th>
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Komentar/Notifikasi
-                                        <th class="border border-gray-300 px-4 py-2" rowspan="2">Status</th>
-                                        <th class="border border-gray-300 px-4 py-2" colspan="2">Aksi</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Nama Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Deskripsi Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Banyak Dilihat (kali)</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Banyak Upvote</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Banyak Downvote</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Dokumen Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Kategori Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Gambar Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Tautan Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Tools Portofolio</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Komentar/Notifikasi</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Status</th>
+                                        <th class="border border-gray-300 px-2 sm:px-4 py-2">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($dataPortofolio as $portofolio)
-                                        <tr>
+                                        <tr class="hover:bg-gray-50">
                                             <td class="border border-gray-300 px-4 py-2">
                                                 {{ $portofolio->nama_portofolio }}</td>
                                             <td class="border border-gray-300 px-4 py-2">
@@ -212,8 +210,7 @@
                                                 @if ($portofolio->tautan->count() > 0)
                                                     @foreach ($portofolio->tautan as $tautan)
                                                         <div class="mb-1">
-                                                            <a href="{{ $tautan->tautan_portofolio }}"
-                                                                target="_blank"
+                                                            <a href="{{ $tautan->tautan_portofolio }}" target="_blank"
                                                                 class="text-blue-600 hover:underline text-sm block">
                                                                 {{ Str::limit($tautan->tautan_portofolio, 25) }}
                                                             </a>
@@ -308,8 +305,8 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit"
-                                                                class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                                                                onclick="return confirm('Yakin ingin menghapus project ini?')">
+                                                                class="bg-red-400 text-white px-2 py-1 rounded opacity-60 cursor-not-allowed"
+                                                                disabled>
                                                                 Hapus
                                                             </button>
                                                         </form>
@@ -319,29 +316,25 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-gray-500 py-4">Tidak ada
-                                                informasi
-                                                portofolio saat ini.</td>
+                                            <td colspan="14" class="text-center text-gray-500 py-4">Tidak ada
+                                                informasi portofolio saat ini.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
-
-                            {{-- Paginasi untuk Admin --}}
-                            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                <div class="text-sm text-gray-600">
-                                    Menampilkan <strong>{{ $dataPortofolio->count() }}</strong> dari
-                                    <strong>{{ $dataPortofolio->total() }}</strong> portofolio
-                                </div>
-                                <div>
-                                    {{ $dataPortofolio->links('vendor.pagination.always') }}
-                                </div>
+                        </div>
+                        {{-- Paginasi untuk Admin (tidak ikut scroll) --}}
+                        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-sm text-gray-600">
+                                Menampilkan <strong>{{ $dataPortofolio->count() }}</strong> dari
+                                <strong>{{ $dataPortofolio->total() }}</strong> portofolio
+                            </div>
+                            <div>
+                                {{ $dataPortofolio->links('vendor.pagination.always') }}
                             </div>
                         </div>
                     @else
                         {{-- Tampilan untuk User Biasa dengan Search & Filter --}}
-
-                        {{-- Search & Filter Bar --}}
                         <div class="mb-6 bg-gray-50 rounded-lg p-4">
                             <form method="GET" action="{{ route('dashboard') }}#portofolio-section"
                                 class="space-y-4">
@@ -418,25 +411,21 @@
                                     </div>
                                 </div>
 
-                                <div class="flex gap-3">
+                                <div class="flex flex-col sm:flex-row gap-3">
                                     <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                                        class="bg-blue-600 text-white px-4 py-2 rounded text-center">
                                         Cari
                                     </button>
                                     <a href="{{ route('dashboard') }}#portofolio-section"
-                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
+                                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium text-center">
                                         Reset
-                                    </a>
-                                    <a href="{{ route('portofolio.create') }}"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                                        + Tambah Portofolio
                                     </a>
                                 </div>
                             </form>
                         </div>
 
                         {{-- Results Info --}}
-                        <div class="mb-4 flex justify-between items-center">
+                        <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-2">
                             <div class="text-sm text-gray-600">
                                 Menampilkan {{ $dataPortofolio->count() }} dari {{ $dataPortofolio->total() }}
                                 portofolio
@@ -462,13 +451,13 @@
                         {{-- Grid Portofolio --}}
                         @forelse ($dataPortofolio as $portofolio)
                             @if ($loop->first)
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             @endif
 
                             <div
-                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden flex flex-col h-full">
                                 {{-- Gambar Portofolio --}}
-                                <div class="aspect-video bg-gray-100 overflow-hidden">
+                                <div class="p-4 border-b border-gray-100">
                                     @if ($portofolio->gambar && $portofolio->gambar->first())
                                         <img src="{{ asset('storage/' . $portofolio->gambar->first()->gambar_portofolio) }}"
                                             alt="{{ $portofolio->nama_portofolio }}"
@@ -485,7 +474,7 @@
                                 </div>
 
                                 {{-- Content --}}
-                                <div class="p-4">
+                                <div class="p-4 flex flex-col flex-1">
                                     <h3 class="font-semibold text-lg mb-2 line-clamp-2">
                                         {{ $portofolio->nama_portofolio }}
                                     </h3>
@@ -540,7 +529,7 @@
 
                                     {{-- Action Button --}}
                                     <a href="{{ route('portofolio.show', $portofolio->id_portofolio) }}"
-                                        class="block w-full bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                                        class="block w-full bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium mt-auto">
                                         Lihat Detail
                                     </a>
                                 </div>
@@ -591,6 +580,47 @@
             </div>
         </div>
     </div>
+    </div>
+
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+            table.min-w-\[900px\] {
+                min-width: 600px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid-cols-1 {
+                grid-template-columns: 1fr !important;
+            }
+
+            .sm\:grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+
+            .lg\:grid-cols-3 {
+                grid-template-columns: 1fr !important;
+            }
+
+            table.min-w-\[900px\] {
+                min-width: 400px;
+            }
+        }
+    </style>
     </div>
 
     <style>

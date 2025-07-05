@@ -1,9 +1,8 @@
 @if (auth()->user()->hasRole('admin'))
-    <div class="py-12">
         <section class="bg-[#DDF1FB]">
             <div id="user-section" class="py-12">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="bg-white rounded-xl p-4 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
                         <div class="p-6 text-gray-900">
                             <h3 class="text-lg font-semibold mb-4">Daftar User Terdaftar</h3>
 
@@ -32,7 +31,7 @@
                                 </select>
                                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Cari</button>
                                 <a href="{{ route('dashboard') }}?tab=user"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded">Reset</a>
+                                    class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium">Reset</a>
                             </form>
 
                             <div class="overflow-x-auto">
@@ -114,7 +113,7 @@
                                 </table>
                             </div>
                             {{-- PAGINATION --}}
-                            <div class="text-sm text-gray-600">
+                            <div class="text-sm text-gray-600 mt-4">
                                 Menampilkan <strong>{{ $users->count() }}</strong> dari
                                 <strong>{{ $users->total() }}</strong> users
                             </div>
@@ -124,5 +123,4 @@
                 </div>
             </div>
         </section>
-    </div>
 @endif

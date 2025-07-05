@@ -361,7 +361,7 @@
                 </div>
             @endif
             <a href="{{ route('dashboard') }}"
-                class="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-base text-center transition w-full sm:w-auto text-center">
+                class="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-base text-center transition w-full sm:w-auto">
                 ← Back ke Dashboard
             </a>
         </div>

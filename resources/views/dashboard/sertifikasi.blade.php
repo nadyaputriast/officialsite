@@ -1,9 +1,9 @@
 <section class="bg-[#DDF1FB]">
-    <div id="sertifikasi-section" class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="flex justify-between items-center mb-6">
+    <div id="event-section" class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl p-4 sm:p-6 shadow-md border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
+                <div class="p-0 sm:p-6 text-gray-900">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                         <h3 class="text-lg font-semibold">Informasi Sertifikasi</h3>
                     </div>
 
@@ -221,8 +221,9 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit"
-                                                                class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700 transition"
-                                                                onclick="return confirm('Yakin ingin menghapus sertifikasi ini? Tindakan ini tidak dapat dibatalkan!')">Hapus
+                                                                class="bg-red-400 text-white px-2 py-1 rounded opacity-60 cursor-not-allowed"
+                                                                disabled>
+                                                                Hapus
                                                             </button>
                                                         </form>
                                                     @endif
@@ -249,6 +250,7 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
 
                             {{-- PAGINATION --}}
                             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -261,7 +263,6 @@
                                     {{ $dataSertifikasi->links('vendor.pagination.always') }}
                                 </div>
                             </div>
-                        </div>
                     @else
                         {{-- Tampilan untuk User Biasa --}}
                         @forelse ($dataSertifikasi as $sertifikasi)

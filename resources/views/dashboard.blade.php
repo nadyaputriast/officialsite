@@ -23,16 +23,21 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
-<body class="antialiased font-sans bg-white">
+<body class="antialiased font-sans bg-white" x-data="{ currentView: 'home', open: false }">
+    {{-- Header --}}
     @if (auth()->user() && !auth()->user()->hasRole('admin'))
         {{-- Banner --}}
         <x-banner-component />
-        <div x-data="{ currentView: 'home' }">
+        <div >
             {{-- Navbar --}}
-            <header class="bg-white shadow-lg sticky top-0 z-50">
+            <header class="bg-white shadow-lg sticky top-0 z-50" x-data="{ open: false }">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     {{-- Logo --}}
                     <a href="#" class="flex items-center space-x-2" @click.prevent="currentView = 'home'">
@@ -41,8 +46,22 @@
                             Satu<span class="text-blue-600">Ruang</span>
                         </span>
                     </a>
-                    {{-- Navigation Links --}}
-                    <div class="flex-1 flex justify-center space-x-4">
+
+                    {{-- Hamburger Menu (mobile only) --}}
+                    <button @click="open = !open"
+                        class="sm:hidden flex items-center px-3 py-2 border rounded text-gray-600 border-gray-400 hover:text-blue-600 hover:border-blue-600 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                            <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    {{-- Navigation Links (desktop only) --}}
+                    <div class="hidden sm:flex flex-1 justify-center space-x-4">
                         <a href="#" @click.prevent="currentView = 'home'"
                             :class="currentView === 'home' ? 'text-blue-600 font-bold' : 'text-black hover:text-blue-600'">Home</a>
                         <a href="#" @click.prevent="currentView = 'project'"
@@ -54,16 +73,14 @@
                         <a href="#" @click.prevent="currentView = 'download'"
                             :class="currentView === 'download' ? 'text-blue-600 font-bold' : 'text-black hover:text-blue-600'">Download</a>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+                    {{-- Auth Links (desktop only) --}}
+                    <div class="hidden sm:flex flex-col sm:flex-row gap-4 justify-center items-center">
                         @auth
-                            {{-- Link ke Dashboard --}}
-                            <a href="{{ route('dashboard') }}" class="text-black hover:text-blue-600 text-center">
-                                Dashboard
-                            </a>
-                            {{-- Notifikasi selalu tampil --}}
+                            <a href="{{ route('dashboard') }}"
+                                class="text-black hover:text-blue-600 text-center">Dashboard</a>
                             @include('dashboard.notifikasi')
                             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                                {{-- Dropdown --}}
                                 <x-dropdown align="right" width="48">
                                     <x-slot name="trigger">
                                         <button
@@ -106,12 +123,50 @@
                         @endauth
                     </div>
                 </div>
+
+                {{-- Mobile Menu (visible only when open) --}}
+                <div class="sm:hidden" x-show="open" x-transition>
+                    <div class="px-4 pt-4 pb-6 space-y-2">
+                        <a href="#" @click.prevent="currentView = 'home'; open = false"
+                            :class="currentView === 'home' ? 'text-blue-600 font-bold block' :
+                                'text-black hover:text-blue-600 block'">Home</a>
+                        <a href="#" @click.prevent="currentView = 'project'; open = false"
+                            :class="currentView === 'project' ? 'text-blue-600 font-bold block' :
+                                'text-black hover:text-blue-600 block'">Project</a>
+                        <a href="#" @click.prevent="currentView = 'event'; open = false"
+                            :class="currentView === 'event' ? 'text-blue-600 font-bold block' :
+                                'text-black hover:text-blue-600 block'">Event</a>
+                        <a href="#" @click.prevent="currentView = 'hiring'; open = false"
+                            :class="currentView === 'hiring' ? 'text-blue-600 font-bold block' :
+                                'text-black hover:text-blue-600 block'">Hiring</a>
+                        <a href="#" @click.prevent="currentView = 'download'; open = false"
+                            :class="currentView === 'download' ? 'text-blue-600 font-bold block' :
+                                'text-black hover:text-blue-600 block'">Download</a>
+
+                        @auth
+                            <a href="{{ route('dashboard') }}" class="block text-black hover:text-blue-600">Dashboard</a>
+                            <x-dropdown-link :href="route('profile')" wire:navigate>
+                                {{ __('Profile') }}
+                            </x-dropdown-link>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        @else
+                            <a href="{{ route('register') }}" class="block text-black hover:text-blue-600">Register</a>
+                            <a href="{{ route('login') }}" class="block text-black hover:text-blue-600">Login</a>
+                        @endauth
+                    </div>
+                </div>
             </header>
 
             {{-- Konten Dinamis --}}
             <div>
-                {{-- Home: semua section --}}
-                <div x-show="currentView === 'home'">
+                {{-- Home --}}
+                <div x-show="currentView === 'home'" x-cloak>
                     {{-- Hero Section --}}
                     <div
                         class="max-w-7xl mx-auto flex flex-col md:flex-row items-center px-6 space-y-6 md:space-y-0 md:space-x-12">
@@ -120,10 +175,7 @@
                                 Passion<br>Inspire Others</h1>
                             <p class="mt-4 text-gray-700">
                                 <strong>SatuRuang</strong> adalah platform digital yang dirancang untuk mengumpulkan dan
-                                memamerkan
-                                karya akademik mahasiswa dalam satu ruang kolaboratif. Platform ini hadir sebagai wadah
-                                apresiasi,
-                                publikasi, dan pengembangan diri.
+                                memamerkan karya akademik mahasiswa dalam satu ruang kolaboratif.
                             </p>
                             <div class="mt-6 space-x-4">
                                 @auth
@@ -146,85 +198,84 @@
                                 style="border-radius: 50%;">
                         </div>
                     </div>
-                    <div class="space-y-12">
+
+                    <div class="space-y-12 mt-12">
                         {{-- KategoriStat Section --}}
                         <section class="bg-gradient-to-r from-[#75AAD8] to-[#DDF1FB] py-12">
                             <div class="max-w-7xl mx-auto px-4">
-                                <div class="grid grid-cols-5 gap-6 text-center">
-                                    <div class="text-center mb-8 col-span-1 row-span-2 flex flex-col justify-center">
-                                        <h2 class="text-3xl font-bold text-white mb-3">Kategori Proyek</h2>
-                                        <p class="text-white text-lg">Lihat Berbagai Kategori Proyek Informatika</p>
-                                    </div>
+                                <div class="text-center mb-12">
+                                    <h2 class="text-3xl font-bold text-white mb-3">Kategori Proyek</h2>
+                                    <p class="text-white text-lg">Lihat Berbagai Kategori Proyek Informatika</p>
+                                </div>
+
+                                <div
+                                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                                     @foreach ($kategoriStats as $kategori)
                                         <div
-                                            class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                                            <div class="flex flex-col items-center justify-between mb-4">
-                                                <div>
-                                                    <h3 class="font-semibold text-gray-900 mb-1">
-                                                        {{ $kategori['nama'] }}</h3>
-                                                    <p class="text-3xl font-bold text-blue-600">
-                                                        {{ $kategori['jumlah'] }}
-                                                    </p>
-                                                    <p class="text-sm text-gray-500">proyek</p>
-                                                </div>
-                                                <div class="text-blue-400">
-                                                    {{-- Icon sesuai kategori --}}
+                                            class="bg-white rounded-xl shadow p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                                            <div class="flex flex-col items-center mb-4">
+                                                <h3
+                                                    class="font-semibold text-gray-900 mb-1 text-sm text-center leading-tight line-clamp-2 h-10">
+                                                    {{ $kategori['nama'] }}
+                                                </h3>
+                                                <p class="text-3xl font-bold text-blue-600">
+                                                    {{ $kategori['jumlah'] }}
+                                                </p>
+                                                <p class="text-sm text-gray-500">proyek</p>
+
+                                                <div class="mt-4">
                                                     @switch($kategori['nama'])
                                                         @case('UI/UX Design')
-                                                            <img src="{{ asset('images/uiux.png') }}" alt="UI/UX Design"
-                                                                class="w-20 h-20">
+                                                            <img src="{{ asset('images/uiux.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @case('Website Development')
-                                                            <img src="{{ asset('images/default.png') }}"
-                                                                alt="Website Development" class="w-20 h-20">
+                                                            <img src="{{ asset('images/default.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @case('Mobile Development')
-                                                            <img src="{{ asset('images/mobdev.png') }}"
-                                                                alt="Mobile Development" class="w-20 h-20">
+                                                            <img src="{{ asset('images/mobdev.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @case('Game Development')
-                                                            <img src="{{ asset('images/webdev.png') }}"
-                                                                alt="Game Development" class="w-20 h-20">
+                                                            <img src="{{ asset('images/webdev.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @case('Internet of Things')
-                                                            <img src="{{ asset('images/iot.png') }}" alt="Internet of Things"
-                                                                class="w-20 h-20">
+                                                            <img src="{{ asset('images/iot.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @case('ML/AI')
                                                             <img src="{{ asset('images/machinelearning.png') }}"
-                                                                alt="Machine Learning/AI" class="w-20 h-20">
+                                                                class="w-16 h-16">
                                                         @break
 
                                                         @case('Blockchain')
-                                                            <img src="{{ asset('images/blockchain.png') }}" alt="Blockchain"
-                                                                class="w-20 h-20">
+                                                            <img src="{{ asset('images/blockchain.png') }}"
+                                                                class="w-16 h-16">
                                                         @break
 
                                                         @case('Cyber Security')
-                                                            <img src="{{ asset('images/cyber.png') }}" alt="Cyber Security"
-                                                                class="w-20 h-20">
+                                                            <img src="{{ asset('images/cyber.png') }}" class="w-16 h-16">
                                                         @break
 
                                                         @default
-                                                            <img src="{{ asset('images/default.png') }}" alt="Default Icon"
-                                                                class="w-20 h-20">
+                                                            <img src="{{ asset('images/default.png') }}" class="w-16 h-16">
                                                     @endswitch
                                                 </div>
                                             </div>
+
                                             <a href="{{ route('portofolio.index', ['kategori' => $kategori['nama']]) }}"
-                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline block">
-                                                Lihat Portofolio Sejenis →
+                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline block text-center">
+                                                Lihat Sejenis →
                                             </a>
                                         </div>
                                     @endforeach
                                 </div>
-                                <div class="mt-8 text-center">
-                                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+
+                                {{-- Navigasi Bawah --}}
+                                <div class="mt-12 text-center">
+                                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                         <a href="{{ route('portofolio.index') }}"
                                             class="text-blue-600 hover:text-white px-6 py-2 font-medium hover:underline">
                                             Lihat Semua Portofolio
@@ -239,72 +290,77 @@
                                 </div>
                             </div>
                         </section>
+                        {{-- Hall of Fame --}}
                         @include('dashboard.halloffame')
+
                         {{-- Ajakan Showcase --}}
-                        <div
-                            class="bg-gradient-to-r from-[#BCE2F8] to-[#75AAD8] rounded-2xl shadow p-4 py-12 px-8 max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8 hover:shadow-lg transition duration-300">
-                            <div class="w-full md:w-1/3 flex justify-center">
-                                <img src="{{ asset('images/ayo.png') }}" alt="Ajakan Showcase"
-                                    class="w-48 md:w-52 lg:w-60">
-                            </div>
-                            <div class="md:w-1/2 text-white">
-                                <h2 class="text-2xl font-bold mb-4">Ayo Mulai <span class="italic">Showcase</span>
-                                    Karyamu!</h2>
-                                <p class="mb-6">Ikuti langkah-langkah di bawah ini dan mulai showcase karyamu
-                                    sekarang juga:</p>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                                    <div
-                                        class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
-                                        <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2"
-                                            alt="Buat Akun">
-                                        <a href="{{ route('register') }}"
-                                            class="px-auto py-auto font-semibold text-black">Buat Akun</a>
-                                    </div>
-                                    <div
-                                        class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
-                                        <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2"
-                                            alt="Lengkapi Profil">
-                                        <a href="{{ route('profile') }}"
-                                            class="px-auto py-auto font-semibold text-black">Lengkapi Profil</a>
-                                    </div>
-                                    <div
-                                        class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
-                                        <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2"
-                                            alt="Upload Karya">
-                                        <a href="{{ route('portofolio.create') }}"
-                                            class="px-auto py-auto font-semibold text-black">Upload Karya</a>
-                                    </div>
-                                    <div
-                                        class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
-                                        <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2"
-                                            alt="Bagikan">
-                                        <a href="#" class="px-auto py-auto font-semibold text-black">Bagikan</a>
+                        <div class="mt-12 mb-4 ml-4 mr-4">
+                            <div
+                                class="bg-gradient-to-r from-[#BCE2F8] to-[#75AAD8] rounded-2xl shadow p-4 py-12 px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-8 hover:shadow-lg transition duration-300">
+                                <div class="w-full md:w-1/3 flex justify-center">
+                                    <img src="{{ asset('images/ayo.png') }}" alt="Ajakan Showcase"
+                                        class="w-48 md:w-52 lg:w-60">
+                                </div>
+                                <div class="md:w-1/2 text-white">
+                                    <h2 class="text-2xl font-bold mb-4">Ayo Mulai <span class="italic">Showcase</span>
+                                        Karyamu!</h2>
+                                    <p class="mb-6">Ikuti langkah-langkah di bawah ini dan mulai showcase karyamu
+                                        sekarang juga:</p>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                                        <div
+                                            class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
+                                            <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2">
+                                            <a href="{{ route('register') }}"
+                                                class="px-auto py-auto font-semibold text-black">Buat
+                                                Akun</a>
+                                        </div>
+                                        <div
+                                            class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
+                                            <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2">
+                                            <a href="{{ route('profile') }}"
+                                                class="px-auto py-auto font-semibold text-black">Lengkapi Profil</a>
+                                        </div>
+                                        <div
+                                            class="bg-white rounded-lg shadow rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
+                                            <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2">
+                                            <a href="{{ route('portofolio.create') }}"
+                                                class="px-auto py-auto font-semibold text-black">Upload Karya</a>
+                                        </div>
+                                        <div
+                                            class="bg-white rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-4">
+                                            <img src="{{ asset('images/website.jpg') }}" class="mx-auto h-12 mb-2">
+                                            <a href="#"
+                                                class="px-auto py-auto font-semibold text-black">Bagikan</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {{-- Project: hanya portofolio --}}
-                <div x-show="currentView === 'project'">
+
+                {{-- Project --}}
+                <div x-show="currentView === 'project'" x-cloak>
                     @include('dashboard.portofolio')
                 </div>
-                {{-- Event: hanya event --}}
-                <div x-show="currentView === 'event'">
+
+                {{-- Event --}}
+                <div x-show="currentView === 'event'" x-cloak>
                     @include('dashboard.event')
                 </div>
-                {{-- Hiring: hanya oprek --}}
-                <div x-show="currentView === 'hiring'">
+
+                {{-- Hiring --}}
+                <div x-show="currentView === 'hiring'" x-cloak>
                     @include('dashboard.oprek')
                 </div>
-                {{-- Download: hanya download --}}
-                <div x-show="currentView === 'download'">
+
+                {{-- Download --}}
+                <div x-show="currentView === 'download'" x-cloak>
                     @include('dashboard.download')
                 </div>
             </div>
         </div>
     @else
-        {{-- SIDEBAR ADMIN --}}
         <header class="bg-white shadow-lg sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 {{-- Logo --}}
@@ -315,50 +371,69 @@
                     </span>
                 </a>
 
-                <div class="hidden sm:flex sm:items-center sm:ms-6">
-                    {{-- Dropdown --}}
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                <div x-data="{ nama_pengguna: '{{ auth()->user()->nama_pengguna }}' }" x-text="nama_pengguna"
-                                    x-on:profile-updated.window="nama_pengguna = $event.detail.name"></div>
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
+                {{-- Dropdown --}}
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <div x-data="{ nama_pengguna: '{{ auth()->user()->nama_pengguna }}' }" x-text="nama_pengguna"
+                                x-on:profile-updated.window="nama_pengguna = $event.detail.name"></div>
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
 
-                        <x-slot name="content">
-                            <x-dropdown-link :href="route('profile')" wire:navigate>
-                                {{ __('Profile') }}
+                    <x-slot name="content">
+                        <x-dropdown-link :href="route('profile')" wire:navigate>
+                            {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <x-dropdown-link href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();">
+                                {{ __('Log Out') }}
                             </x-dropdown-link>
-
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <x-dropdown-link href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                </div>
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+            </div>
         </header>
         {{-- Navigation Links --}}
-        <div class="flex min-h-screen bg-gray-50">
+        <div class="flex flex-col md:flex-row min-h-screen bg-gray-50">
             {{-- Sidebar --}}
-            <aside class="w-64 bg-[#504E4E] border-r border-gray-200 flex-shrink-0 hidden md:block">
-                <div class="h-full flex flex-col py-6 px-4 mt-6">
+            <aside class="w-full md:w-64 bg-[#504E4E] border-r border-gray-200 flex-shrink-0 md:block min-h-screen"
+                x-data="{ openSidebar: false }">
+                {{-- Mobile Sidebar Toggle --}}
+                <div class="md:hidden flex items-center justify-between px-4 py-3 bg-[#504E4E]">
+                    <span class="text-white font-bold text-lg">Menu</span>
+                    <button @click="openSidebar = !openSidebar" class="text-white focus:outline-none">
+                        <svg x-show="!openSidebar" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg x-show="openSidebar" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                {{-- Sidebar Content --}}
+                <div class="h-full flex flex-col py-6 px-4 mt-0 md:mt-6"
+                    :class="{ 'hidden': !openSidebar, 'block': openSidebar, 'md:block': true }">
                     <nav class="flex-1 space-y-2">
                         <a href="{{ route('dashboard', ['tab' => 'validasi_event']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'validasi_event' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'validasi_event' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{-- ...icon and label... --}}
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path fill-rule="evenodd"
@@ -370,10 +445,10 @@
                             </svg>
                             <span>Validasi Pembayaran Event</span>
                         </a>
-
+                        {{-- ...repeat for all menu items, unchanged... --}}
                         <a href="{{ route('dashboard', ['tab' => 'user']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'user' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'user' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path fill-rule="evenodd"
@@ -382,10 +457,9 @@
                             </svg>
                             <span>User</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'event']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'event' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'event' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path
@@ -396,10 +470,10 @@
                             </svg>
                             <span>Event</span>
                         </a>
-
+                        {{-- ...continue for all other menu items as before... --}}
                         <a href="{{ route('dashboard', ['tab' => 'oprek']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'oprek' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'oprek' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path fill-rule="evenodd"
@@ -410,10 +484,9 @@
                             </svg>
                             <span>Hiring</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'portofolio']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'portofolio' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'portofolio' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path
@@ -421,21 +494,19 @@
                             </svg>
                             <span>Project</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'pengabdian']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'pengabdian' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'pengabdian' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path
-                                    d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+                                    d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.75 0 0 1-.704 0l-.003-.001Z" />
                             </svg>
                             <span>Pengabdian</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'prestasi']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'prestasi' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'prestasi' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path fill-rule="evenodd"
@@ -444,10 +515,9 @@
                             </svg>
                             <span>Prestasi</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'sertifikasi']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'sertifikasi' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'sertifikasi' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path
@@ -459,10 +529,9 @@
                             </svg>
                             <span>Sertifikasi</span>
                         </a>
-
                         <a href="{{ route('dashboard', ['tab' => 'download']) }}"
                             class="w-full text-left px-4 py-2 rounded flex items-center gap-2 font-medium transition
-                          {{ request('tab') === 'download' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
+                            {{ request('tab') === 'download' ? 'bg-[#4B83BF] text-white' : 'text-white hover:bg-gray-500' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="size-6">
                                 <path
