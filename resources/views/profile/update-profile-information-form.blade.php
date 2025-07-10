@@ -3,7 +3,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Profile Information
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        <p class="mt-1 max-w-7xl text-sm text-gray-500">
             Update your account's profile information and email address.
         </p>
 
@@ -29,34 +29,35 @@
 
             <!-- Nama Pengguna -->
             <div class="grid grid-cols-6 gap-6">
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="nama_pengguna" value="Nama Pengguna" />
                     <x-input id="nama_pengguna" type="text" name="nama_pengguna" class="mt-1 block w-full" value="{{ old('nama_pengguna', auth()->user()->nama_pengguna) }}" required />
                 </div>
 
                 <!-- Email -->
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="email" value="Email" />
                     <x-input id="email" type="email" name="email" class="mt-1 block w-full" value="{{ old('email', auth()->user()->email) }}" required />
                 </div>
 
                 <!-- Tanggal Lahir -->
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="tanggal_lahir" value="Tanggal Lahir" />
                     <x-input id="tanggal_lahir" type="date" name="tanggal_lahir" class="mt-1 block w-full" value="{{ old('tanggal_lahir', auth()->user()->tanggal_lahir) }}" />
                 </div>
 
                 <!-- Alamat -->
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="alamat" value="Alamat" />
                     <x-input id="alamat" type="text" name="alamat" class="mt-1 block w-full" value="{{ old('alamat', auth()->user()->alamat) }}" />
                 </div>
             </div>
 
             <div class="flex items-center justify-end mt-6">
-                <x-button>
-                    Save
-                </x-button>
+                <button type="submit"
+                    class="px-4 py-2 bg-[#4B83BF] hover:bg-[#5a93c7] text-white rounded-lg font-semibold transition">
+                    Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>

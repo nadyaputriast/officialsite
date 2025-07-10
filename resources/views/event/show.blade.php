@@ -32,6 +32,118 @@
                         $hasValidTicket = $myRegistration && ($myRegistration->nomor_tiket || $myPembayaran);
                     @endphp
 
+                    @if (!$isAdmin && !$isCreator)
+                        <div class="mb-6">
+                            @if ($event->status_event != 1)
+                                <div
+                                    class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
+                                    Event ini belum divalidasi admin. Pendaftaran belum tersedia.
+                                </div>
+                            @elseif ($event->penyelenggara_event === 'eksternal')
+                                <a href="{{ $event->tautan_event }}"
+                                    class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                                    target="_blank">
+                                    Daftar di Website Penyelenggara
+                                </a>
+                            @elseif ($event->kuota_event <= 0)
+                                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+                                    Maaf, kuota event sudah habis
+                                </div>
+                            @elseif ($hasValidTicket)
+                                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
+                                    Anda sudah terdaftar pada event ini
+                                </div>
+                            @else
+                                <a href="{{ route('event.register', $event->id_event) }}" id="btn-daftar"
+                                    class="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
+                                    @if ($event->harga_event == 0)
+                                        Daftar Gratis
+                                    @else
+                                        Daftar & Bayar (Rp{{ number_format($event->harga_event, 0, ',', '.') }})
+                                    @endif
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="flex gap-10">
+                        {{-- Thumbnail --}}
+                        <div class="mb-6">
+                            <img src="{{ asset('storage/' . $event->thumbnail_event) }}" alt="{{ $event->nama_event }}"
+                                class="w-full max-w-lg h-56 object-cover rounded-lg shadow-md">
+                        </div>
+                        <div class="w-max">
+                            <div class="px-4 py-4 bg-gray-100 rounded-lg shadow-md">
+                                <div class="mb-3">
+                                    <span class="font-semibold text-gray-700">Harga Event:</span>
+                                    <p class="text-gray-900 text-lg font-semibold">
+                                        @if ($event->harga_event == 0)
+                                            <span class="text-green-600">GRATIS</span>
+                                        @else
+                                            Rp{{ number_format($event->harga_event, 0, ',', '.') }}
+                                        @endif
+                                    </p>
+                                </div>
+                                @if ($event->penyelenggara_event === 'internal')
+                                    <div>
+                                        <span class="font-semibold text-gray-700">Kuota Tersisa:</span>
+                                        <p class="text-gray-900">
+                                            {{ $event->kuota_event }}
+                                            @if ($event->kuota_event <= 10)
+                                                <span class="text-red-500 text-sm">(Terbatas!)</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @if ($event->penyelenggara_event === 'eksternal')
+                                    <div>
+                                        <span class="font-semibold text-gray-700">Link Pendaftaran:</span>
+                                        <a href="{{ $event->tautan_event }}"
+                                            class="text-blue-600 underline hover:text-blue-800" target="_blank">
+                                            Klik di sini
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="font-semibold text-gray-700">Nama Event:</span>
+                                <p class="text-gray-900">{{ $event->nama_event }}</p>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">Jenis Event:</span>
+                                <p class="text-gray-900">{{ ucfirst($event->jenis_event) }}</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <span class="font-semibold text-gray-700">Penyelenggara:</span>
+                                <p class="text-gray-900">{{ ucfirst($event->penyelenggara_event) }} -
+                                    {{ $event->nama_penyelenggara }}</p>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">Tanggal & Waktu:</span>
+                                <p class="text-gray-900">
+                                    {{ date('d/m/Y', strtotime($event->tanggal_event)) }} - {{ $event->waktu_event }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <span class="font-semibold text-gray-700">Deskripsi Event:</span>
+                        <div class="bg-gray-100 p-4 rounded mt-2">
+                            <p class="text-gray-800 leading-relaxed">{{ $event->deskripsi_event }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Tiket --}}
                     @if ($hasValidTicket)
                         <div class="mb-6">
                             {{-- ✅ ALTERNATIVE: Card with button style --}}
@@ -132,71 +244,6 @@
                         </div>
                     @endif
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="space-y-3">
-                            <div>
-                                <span class="font-semibold text-gray-700">Nama Event:</span>
-                                <p class="text-gray-900">{{ $event->nama_event }}</p>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-700">Jenis Event:</span>
-                                <p class="text-gray-900">{{ ucfirst($event->jenis_event) }}</p>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-700">Tanggal & Waktu:</span>
-                                <p class="text-gray-900">
-                                    {{ date('d/m/Y', strtotime($event->tanggal_event)) }} - {{ $event->waktu_event }}
-                                </p>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-700">Penyelenggara:</span>
-                                <p class="text-gray-900">{{ ucfirst($event->penyelenggara_event) }} -
-                                    {{ $event->nama_penyelenggara }}</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div>
-                                <span class="font-semibold text-gray-700">Harga Event:</span>
-                                <p class="text-gray-900 text-lg font-semibold">
-                                    @if ($event->harga_event == 0)
-                                        <span class="text-green-600">GRATIS</span>
-                                    @else
-                                        Rp{{ number_format($event->harga_event, 0, ',', '.') }}
-                                    @endif
-                                </p>
-                            </div>
-                            @if ($event->penyelenggara_event === 'internal')
-                                <div>
-                                    <span class="font-semibold text-gray-700">Kuota Tersisa:</span>
-                                    <p class="text-gray-900">
-                                        {{ $event->kuota_event }}
-                                        @if ($event->kuota_event <= 10)
-                                            <span class="text-red-500 text-sm">(Terbatas!)</span>
-                                        @endif
-                                    </p>
-                                </div>
-                            @endif
-
-                            @if ($event->penyelenggara_event === 'eksternal')
-                                <div>
-                                    <span class="font-semibold text-gray-700">Link Pendaftaran:</span>
-                                    <a href="{{ $event->tautan_event }}"
-                                        class="text-blue-600 underline hover:text-blue-800" target="_blank">
-                                        Klik di sini
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <span class="font-semibold text-gray-700">Deskripsi Event:</span>
-                        <div class="bg-gray-50 p-4 rounded mt-2">
-                            <p class="text-gray-800 leading-relaxed">{{ $event->deskripsi_event }}</p>
-                        </div>
-                    </div>
-
                     @if ($isAdmin || $isCreator)
                         <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                             <h4 class="font-semibold text-blue-800 mb-2">📊 Info Admin/Pembuat</h4>
@@ -225,9 +272,41 @@
                                                 <p><strong>Diskon:</strong>
                                                     {{ $currentPromo->nilai_promo }}{{ $currentPromo->jenis_promo == 'Persentase' ? '%' : '' }}
                                                 </p>
-                                                <p><strong>Harga Promo:</strong>
-                                                    Rp{{ number_format($currentPromo->harga_promo, 0, ',', '.') }}
-                                                </p>
+
+                                                @php
+                                                    $hargaAsli = $event->harga_event;
+                                                    $nilaiPromo = $currentPromo->nilai_promo;
+                                                    $jenisPromo = $currentPromo->jenis_promo;
+
+                                                    // Hitung harga setelah diskon
+                                                    if ($jenisPromo == 'Persentase') {
+                                                        $hargaPromo = $hargaAsli - ($hargaAsli * $nilaiPromo) / 100;
+                                                    } else {
+                                                        // Jenis promo nominal/rupiah
+                                                        $hargaPromo = $hargaAsli - $nilaiPromo;
+                                                    }
+
+                                                    // Pastikan harga tidak negatif
+                                                    $hargaPromo = max(0, $hargaPromo);
+                                                @endphp
+
+                                                <div class="space-y-1">
+                                                    <p><strong>Harga Normal:</strong>
+                                                        <span
+                                                            class="line-through text-gray-500">Rp{{ number_format($hargaAsli, 0, ',', '.') }}</span>
+                                                    </p>
+                                                    <p><strong>Harga Promo:</strong>
+                                                        <span
+                                                            class="text-green-600 font-bold">Rp{{ number_format($hargaPromo, 0, ',', '.') }}</span>
+                                                        @if ($jenisPromo == 'Persentase')
+                                                            <span class="text-sm text-green-600">(Hemat
+                                                                {{ $nilaiPromo }}%)</span>
+                                                        @else
+                                                            <span class="text-sm text-green-600">(Hemat
+                                                                Rp{{ number_format($nilaiPromo, 0, ',', '.') }})</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
                                             @else
                                                 <p class="text-gray-500 italic">Promo tidak tersedia untuk event ini</p>
                                             @endif
@@ -237,50 +316,6 @@
                             </div>
                         </div>
                     @endif
-
-                    @if (!$isAdmin && !$isCreator)
-                        <div class="mb-6">
-                            @if ($event->status_event != 1)
-                                <div
-                                    class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
-                                    Event ini belum divalidasi admin. Pendaftaran belum tersedia.
-                                </div>
-                            @elseif ($event->penyelenggara_event === 'eksternal')
-                                <a href="{{ $event->tautan_event }}"
-                                    class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-                                    target="_blank">
-                                    Daftar di Website Penyelenggara
-                                </a>
-                            @elseif ($event->kuota_event <= 0)
-                                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
-                                    Maaf, kuota event sudah habis
-                                </div>
-                            @elseif ($hasValidTicket)
-                                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
-                                    Anda sudah terdaftar pada event ini
-                                </div>
-                            @else
-                                <a href="{{ route('event.register', $event->id_event) }}" id="btn-daftar"
-                                    class="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
-                                    @if ($event->harga_event == 0)
-                                        Daftar Gratis
-                                    @else
-                                        Daftar & Bayar (Rp{{ number_format($event->harga_event, 0, ',', '.') }})
-                                    @endif
-                                </a>
-                            @endif
-                        </div>
-                    @endif
-
-                    {{-- Thumbnail --}}
-                    <div class="mb-6">
-                        <span class="font-semibold text-gray-700">Thumbnail Event:</span>
-                        <div class="mt-2">
-                            <img src="{{ asset('storage/' . $event->thumbnail_event) }}"
-                                alt="{{ $event->nama_event }}"
-                                class="w-full max-w-md h-48 object-cover rounded-lg shadow-md">
-                        </div>
-                    </div>
 
                     @php
                         $notif = \App\Models\Notifikasi::where('notifiable_id', $event->id_event)

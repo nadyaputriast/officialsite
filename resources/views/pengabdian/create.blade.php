@@ -5,94 +5,108 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('pengabdian.store') }}" method="POST" enctype="multipart/form-data">
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
+                <div class="px-7 py-4 bg-white">
+                    <form action="{{ route('pengabdian.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
+
                         @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $salah)
-                                        <li>{{ $salah }}</li>
-                                    @endforeach
-                                </ul>
+                            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800">Terdapat kesalahan:</h3>
+                                        <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                            @foreach ($errors->all() as $salah)
+                                                <li>{{ $salah }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         @endif
 
                         @if (Session::has('error'))
-                            {{ Session::get('error') }}
+                            <div class="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
+                                {{ Session::get('error') }}
+                            </div>
                         @endif
 
-                        {{-- Nama Pengabdian --}}
-                        <div class="mb-4">
-                            <label for="judul_pengabdian" class="block text-sm font-medium text-gray-700">Judul Pengabdian</label>
+                        {{-- Judul Pengabdian --}}
+                        <div class="space-y-2">
+                            <label for="judul_pengabdian" class="block text-sm font-semibold text-gray-700">Judul Pengabdian <span class="text-red-500">*</span></label>
                             <input type="text" name="judul_pengabdian" id="judul_pengabdian"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                         </div>
 
                         {{-- Deskripsi --}}
-                        <div class="mb-4">
-                            <label for="deskripsi_pengabdian"
-                                class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                        <div class="space-y-2">
+                            <label for="deskripsi_pengabdian" class="block text-sm font-semibold text-gray-700">Deskripsi <span class="text-red-500">*</span></label>
                             <textarea name="deskripsi_pengabdian" id="deskripsi_pengabdian" rows="4"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required></textarea>
                         </div>
 
                         {{-- Tanggal Pengabdian --}}
-                        <div class="mb-4">
-                            <label for="tanggal_pengabdian" class="block text-sm font-medium text-gray-700">Tanggal
-                                Pengabdian</label>
+                        <div class="space-y-2">
+                            <label for="tanggal_pengabdian" class="block text-sm font-semibold text-gray-700">Tanggal Pengabdian <span class="text-red-500">*</span></label>
                             <input type="date" name="tanggal_pengabdian" id="tanggal_pengabdian"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                         </div>
 
-						{{-- Pelaksana --}}
-                        <div class="mb-4">
-                            <label for="pelaksana" class="block text-sm font-medium text-gray-700">Pelaksana Pengabdian</label>
+                        {{-- Pelaksana --}}
+                        <div class="space-y-2">
+                            <label for="pelaksana" class="block text-sm font-semibold text-gray-700">Pelaksana <span class="text-red-500">*</span></label>
                             <input type="text" name="pelaksana" id="pelaksana"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required>
                         </div>
 
-						{{-- Dokumentasi Pengabdian --}}
-                        <div class="mb-4">
-                            <label for="dokumentasi_pengabdian"
-                                class="block text-sm font-medium text-gray-700">Dokumentasi Pengabdian</label>
+                        {{-- Dokumentasi --}}
+                        <div class="space-y-2">
+                            <label for="dokumentasi_pengabdian" class="block text-sm font-semibold text-gray-700">Dokumentasi Pengabdian <span class="text-red-500">*</span></label>
                             <div id="gambar-container">
-                                <div class="flex items-center mb-2">
+                                <div class="flex items-center gap-3 mb-2">
                                     <input type="file" name="dokumentasi_pengabdian[]" id="dokumentasi_pengabdian"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                        required>
+                                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        accept="image/*" required>
                                     <button type="button"
-                                        class="ml-2 px-3 py-1 bg-green-500 text-black rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-                                        onclick="addDokumentasi()">Add</button>
+                                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        onclick="addDokumentasi()">Tambah</button>
                                 </div>
                             </div>
-
-                            <p class="text-xs text-gray-500 mt-1">Unggah gambar (JPG, PNG, GIF). Maksimal 2MB per
-                                gambar.</p>
+                            <p class="text-xs text-gray-500">Unggah gambar (JPG, PNG, GIF). Maksimal 2MB per gambar.</p>
                         </div>
 
                         {{-- Tag Pengguna --}}
-                        <div class="form-group mb-4">
-                            <label for="user_tags" class="block text-sm font-medium text-gray-700">Tag Pengguna</label>
-                            <p class="text-xs text-gray-500 mb-1">Tag pengguna lain(pisahkan dengan koma), misal @nama1
-                            </p>
+                        <div class="space-y-2">
+                            <label for="user_tags" class="block text-sm font-semibold text-gray-700">Tag Pengguna</label>
+                            <p class="text-xs text-gray-500">Tag pengguna lain (pisahkan dengan koma), misal: @nama1</p>
                             <input type="text" name="user_tags" id="user_tags"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        <button type="submit"
-                            class="px-4 py-2 bg-blue-500 text-black rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Simpan</button>
-
-                        {{-- Tombol Kembali --}}
-                        <a href="{{ route('dashboard') }}"
-                            class="px-4 py-2 text-black hover:text-blue-700 rounded">Kembali</a>
+                        {{-- Tombol --}}
+                        <div class="flex items-center justify-end space-x-4 pt-4">
+                            <a href="{{ route('dashboard') }}"
+                                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Kembali
+                            </a>
+                            <button type="submit"
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#4B83BF] hover:bg-[#5a93c7] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Simpan Pengabdian
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -138,13 +152,11 @@
         function addDokumentasi() {
             const container = document.getElementById('gambar-container');
             const newRow = document.createElement('div');
-            newRow.classList.add('flex', 'items-center', 'mb-2');
+            newRow.classList.add('flex', 'items-center', 'gap-3', 'mb-2');
             newRow.innerHTML = `
-        <input type="file" name="dokumentasi_pengabdian[]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            accept="image/*" required>
-        <button type="button" class="ml-2 px-3 py-1 bg-red-500 text-black rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-            onclick="removeGambar(this)">Remove</button>
-    `;
+                <input type="file" name="dokumentasi_pengabdian[]" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" accept="image/*" required>
+                <button type="button" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500" onclick="removeGambar(this)">Hapus</button>
+            `;
             container.appendChild(newRow);
         }
 

@@ -37,6 +37,7 @@ class Prestasi extends Model
 
     public function taggedUsers()
     {
-        return $this->belongsToMany(User::class, 'prestasi_user_tags', 'id_prestasi', 'id_pengguna');
+        return $this->belongsToMany(User::class, 'prestasi_user_tags', 'id_prestasi', 'id_pengguna')
+            ->withTimestamps();
     }
 }

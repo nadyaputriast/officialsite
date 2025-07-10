@@ -102,7 +102,8 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-1 sm:col-span-2 md:col-span-3 text-center py-12 bg-white rounded-xl border border-gray-200">
+                <div
+                    class="col-span-1 sm:col-span-2 md:col-span-3 text-center py-12 bg-white rounded-xl border border-gray-200">
                     <div class="text-gray-400 mb-4">
                         <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
@@ -148,18 +149,21 @@
                                 {{ $prestasi['tingkatan_prestasi'] }}
                             </span>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">{{ $prestasi['nama_prestasi'] }}</h3>
+                        {{-- <h3 class="font-semibold text-lg mb-2">{{ $prestasi['nama_prestasi'] }}</h3> --}}
+                        <a href="{{ route('prestasi.show', $prestasi['id_prestasi']) }}"
+                            class="text-blue-600 hover:text-blue-800 font-semibold hover:underline block mb-3 line-clamp-2 text-lg">
+                            {{ $prestasi['nama_prestasi'] }}
+                        </a>
                         <p class="text-gray-600 text-sm mb-3">
                             {{ Str::limit($prestasi['deskripsi_prestasi'], 100) }}
                         </p>
                         @if (isset($prestasi['owner']) && $prestasi['owner'])
                             <div class="flex items-center text-sm text-gray-500 mb-2">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                        clip-rule="evenodd">
-                                    </path>
-                                </svg>
-                                {{ $prestasi['owner']['nama_pengguna'] }}
+                                Ketua:
+                                <a href="{{ route('profile.user', $prestasi['owner']['id_pengguna']) }}"
+                                    class="text-blue-600 hover:underline font-medium">
+                                    {{ $prestasi['owner']['nama_pengguna'] }}
+                                </a>
                             </div>
                         @endif
                         <div class="text-xs text-gray-400 mt-auto">

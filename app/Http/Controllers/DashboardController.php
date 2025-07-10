@@ -653,7 +653,7 @@ class DashboardController extends Controller
                 ->where('tingkatan_prestasi', $tingkatan)
                 ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
-                ->with('owner')
+                ->with(['owner', 'taggedUsers'])
                 ->latest()
                 ->take($remainingSlots) // Ambil sebanyak slot yang tersisa
                 ->get();
@@ -672,7 +672,7 @@ class DashboardController extends Controller
                 ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
                 ->whereNotIn('id_prestasi', $existingIds)
-                ->with('owner')
+                ->with(['owner', 'taggedUsers'])
                 ->latest()
                 ->take($remainingSlots)
                 ->get();

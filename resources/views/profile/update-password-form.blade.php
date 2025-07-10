@@ -3,7 +3,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Update Password
         </h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        <p class="mt-1 max-w-7xl text-sm text-gray-500">
             Ensure your account is using a long, random password to stay secure.
         </p>
 
@@ -29,7 +29,7 @@
 
             <!-- Current Password -->
             <div class="grid grid-cols-6 gap-6">
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="current_password" value="Current Password" />
                     <x-input id="current_password" type="password" name="current_password" class="mt-1 block w-full" required autocomplete="current-password" />
                     @error('current_password', 'updatePassword')
@@ -38,7 +38,7 @@
                 </div>
 
                 <!-- New Password -->
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="password" value="New Password" />
                     <x-input id="password" type="password" name="password" class="mt-1 block w-full" required autocomplete="new-password" />
                     @error('password', 'updatePassword')
@@ -47,16 +47,17 @@
                 </div>
 
                 <!-- Confirm Password -->
-                <div class="col-span-6 sm:col-span-4">
+                <div class="col-span-6 sm:col-span-8">
                     <x-label for="password_confirmation" value="Confirm Password" />
                     <x-input id="password_confirmation" type="password" name="password_confirmation" class="mt-1 block w-full" required autocomplete="new-password" />
                 </div>
             </div>
 
             <div class="flex items-center justify-end mt-6">
-                <x-button>
-                    Save
-                </x-button>
+                <button type="submit"
+                    class="px-4 py-2 bg-[#4B83BF] hover:bg-[#5a93c7]  text-white rounded-lg font-semibold transition">
+                    Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>

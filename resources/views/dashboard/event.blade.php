@@ -520,13 +520,13 @@
                             @endif
 
                             <div
-                                class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+                                class="rounded-xl outline outline-1 outline-neutral-300 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
                                 {{-- Event Image/Thumbnail --}}
                                 @if ($event->thumbnail_event)
-                                    <div class="aspect-video bg-gray-100 overflow-hidden">
+                                    <div class="aspect-video bg-gray-100 outline outline-1 outline-neutral-300 overflow-hidden">
                                         <img src="{{ asset('storage/' . $event->thumbnail_event) }}"
                                             alt="{{ $event->nama_event }}"
-                                            class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                                            class="w-full h-full object-cover rounded-tl-xl rounded-tr-xl hover:scale-105 transition duration-300">
                                     </div>
                                 @else
                                     <div class="aspect-video bg-gray-100 flex items-center justify-center">
@@ -590,7 +590,7 @@
                                         @endif
 
                                         {{-- Action Button --}}
-                                        <div class="space-y-2">
+                                        <div class="flex justify-center gap-2">
                                             <a href="{{ route('event.show', $event->id_event) }}"
                                                 class="block w-full bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
                                                 Detail Event
@@ -632,20 +632,20 @@
                                                     Daftar Sekarang
                                                 </a>
                                             @endif
-
-                                            {{-- Info harga untuk event internal --}}
-                                            @if ($event->penyelenggara_event === 'internal')
-                                                <div class="text-xs text-gray-600 text-center">
-                                                    Harga: <span
-                                                        class="font-medium">Rp{{ number_format($event->harga_event, 0, ',', '.') }}</span>
-                                                    @if ($event->kuota_event > 0)
-                                                        • Kuota: {{ $event->kuota_event }} orang
-                                                    @else
-                                                        • <span class="text-red-600">Kuota penuh</span>
-                                                    @endif
-                                                </div>
-                                            @endif
                                         </div>
+
+                                        {{-- Info harga untuk event internal --}}
+                                        @if ($event->penyelenggara_event === 'internal')
+                                            <div class="text-xs text-gray-600 text-center mt-2">
+                                                Harga: <span
+                                                    class="font-medium">Rp{{ number_format($event->harga_event, 0, ',', '.') }}</span>
+                                                @if ($event->kuota_event > 0)
+                                                    • Kuota: {{ $event->kuota_event }} orang
+                                                @else
+                                                    • <span class="text-red-600">Kuota penuh</span>
+                                                @endif
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 

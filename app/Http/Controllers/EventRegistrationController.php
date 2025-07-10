@@ -100,7 +100,6 @@ class EventRegistrationController extends Controller
 
         $event = Event::with('promo')->findOrFail($id);
 
-        // ✅ ADD: Comprehensive validation
         if ($event->status_event !== 1) {
             return back()->with('error', 'Event belum divalidasi admin.');
         }
@@ -113,9 +112,8 @@ class EventRegistrationController extends Controller
             return back()->with('error', 'Kuota event sudah habis.');
         }
 
-        // ✅ FIX: Use consistent field name
         $existingRegistration = EventRegistration::where('id_event', $event->id_event)
-            ->where('id_pengguna', auth()->user()->id_pengguna) // ✅ FIX: Consistent field
+            ->where('id_pengguna', auth()->user()->id_pengguna)
             ->first();
 
         if ($existingRegistration) {
@@ -138,7 +136,6 @@ class EventRegistrationController extends Controller
             }
         }
 
-        // ✅ FIX: Handle external events
         if ($event->penyelenggara_event === 'eksternal') {
             if (!$event->tautan_event) {
                 return back()->with('error', 'Link pendaftaran eksternal tidak tersedia.');
@@ -146,12 +143,10 @@ class EventRegistrationController extends Controller
             return redirect()->away($event->tautan_event);
         }
 
-        // ✅ FIX: Handle free internal events - DIRECT REGISTRATION
         if ($event->harga_event == 0) {
             return $this->handleFreeEventRegistration($event, $existingRegistration);
         }
 
-        // ✅ FIX: Paid internal events - show registration form
         return view('event.registration', compact('event'));
     }
 
@@ -166,7 +161,6 @@ class EventRegistrationController extends Controller
                 'ip' => $request->ip()
             ]);
 
-            // ✅ Basic validation first
             if (!$request->has('kode_promo') || !$request->has('id_event')) {
                 Log::warning('Missing required fields', [
                     'has_kode_promo' => $request->has('kode_promo'),
@@ -179,7 +173,6 @@ class EventRegistrationController extends Controller
                 ], 400);
             }
 
-            // ✅ Validate request data
             $validatedData = $request->validate([
                 'kode_promo' => 'required|string|max:50',
                 'id_event' => 'required|integer|exists:event,id_event',
@@ -187,7 +180,6 @@ class EventRegistrationController extends Controller
 
             Log::info('Request validated successfully', $validatedData);
 
-            // ✅ Find event with error handling
             $event = Event::findOrFail($validatedData['id_event']);
 
             Log::info('Event found', [
@@ -197,7 +189,6 @@ class EventRegistrationController extends Controller
                 'event_status' => $event->status_event
             ]);
 
-            // ✅ Check if event is active
             if ($event->status_event !== 1) {
                 return response()->json([
                     'status' => 'error',
@@ -205,7 +196,6 @@ class EventRegistrationController extends Controller
                 ]);
             }
 
-            // ✅ FIXED: Query promo table properly
             $promo = DB::table('promo_event_internal')
                 ->where('id_event', $event->id_event)
                 ->where('kode_promo', $validatedData['kode_promo'])
@@ -226,7 +216,6 @@ class EventRegistrationController extends Controller
                 ]);
             }
 
-            // ✅ Check promo validity dates
             $now = now();
 
             if ($promo->tanggal_mulai && $now->lt($promo->tanggal_mulai)) {
@@ -243,7 +232,6 @@ class EventRegistrationController extends Controller
                 ]);
             }
 
-            // ✅ Calculate promo price
             $hargaAsli = (int) $event->harga_event;
             $nilaiPromo = (int) $promo->nilai_promo;
             $jenisPromo = $promo->jenis_promo ?? 'Persentase';
@@ -335,13 +323,11 @@ class EventRegistrationController extends Controller
                 'existing_registration' => $existingRegistration ? 'YES' : 'NO'
             ]);
 
-            // ✅ Create or use existing registration
             $registration = $existingRegistration ?: EventRegistration::create([
                 'id_event' => $event->id_event,
                 'id_pengguna' => auth()->user()->id_pengguna,
             ]);
 
-            // ✅ Only decrement quota for new registrations
             if (!$existingRegistration) {
                 $event->refresh();
                 if ($event->kuota_event <= 0) {
@@ -351,7 +337,6 @@ class EventRegistrationController extends Controller
                 $event->decrement('kuota_event');
             }
 
-            // ✅ Generate ticket number if not exists
             if (!$registration->nomor_tiket) {
                 $jumlahTiketValid = EventRegistration::where('id_event', $event->id_event)
                     ->whereNotNull('nomor_tiket')
